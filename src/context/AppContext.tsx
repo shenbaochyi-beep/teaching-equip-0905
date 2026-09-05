@@ -197,7 +197,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [resources, setResources] = useState<ResourceItem[]>(() => {
     const saved = safeStorage.getItem(STORAGE_KEYS.RESOURCES);
-    return safeJsonParse<ResourceItem[]>(saved, INITIAL_RESOURCES);
+    if (!saved) return INITIAL_RESOURCES;
+    const parsed = safeJsonParse<ResourceItem[]>(saved, INITIAL_RESOURCES);
+    // 自動檢測並補足新加入之項目 (如 筆記型電腦(10台)、專業攝影機1台)，並保留既有項目之借用/維修等自訂狀態
+    const existingIds = new Set(parsed.map(r => r.id));
+    const missingItems = INITIAL_RESOURCES.filter(r => !existingIds.has(r.id));
+    if (missingItems.length > 0) {
+      const merged = [...parsed, ...missingItems];
+      safeStorage.setItem(STORAGE_KEYS.RESOURCES, JSON.stringify(merged));
+      return merged;
+    }
+    return parsed;
   });
 
   const [reservations, setReservations] = useState<Reservation[]>(() => {

@@ -547,7 +547,50 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     ],
     imageUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
     description: '班級數位融入教學、生生用平板課堂互動即時回饋專用設備。',
-    cautionNotes: '借還時請逐一清點30台平板與充電線，歸還前請確保已全部插上充電接頭。'
+    cautionNotes: '班級數位融入教學、生生用平板課堂互動即時回饋專用設備。'
+  },
+  {
+    id: 'res-laptop-batch',
+    name: '筆記型電腦 (10台)',
+    category: 'it_equipment',
+    code: 'EQ-NB-10',
+    location: '教務處 招設組設備室 (筆電專用充電推車NB-01)',
+    quantity: 10,
+    availableQuantity: 10,
+    status: 'available',
+    custodian: '教務處招設組',
+    specs: [
+      'Intel Core i7 高效能處理器 / 16GB 記憶體 / 512GB 高速 NVMe SSD',
+      '15.6吋 Full HD 護眼霧面防眩光顯示螢幕',
+      '預載 Windows 11 專業版、Office 365 辦公套件與常用教學研習軟體',
+      '全套配置筆記型電腦 10台、原廠電源供應器 10組與防震手提保護包',
+      '配置專用集中管理充電推車與無線光學滑鼠 10組'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=80',
+    description: '提供全校教師公開授課、專題研討、教學競賽、數位素養研習及分組教學外借使用（全批共10台）。',
+    cautionNotes: '借還時請確實清點 10台筆電主機、變壓充電線與滑鼠，歸還前請確保已正常關機。'
+  },
+  {
+    id: 'res-pro-camera',
+    name: '專業攝影機 (1台)',
+    category: 'it_equipment',
+    code: 'EQ-PCAM-01',
+    location: '教務處 招設組設備室 (防潮箱C-02)',
+    quantity: 1,
+    availableQuantity: 1,
+    status: 'available',
+    custodian: '教務處招設組',
+    specs: [
+      '4K 60fps 廣播級超高畫質專業攝影機主機 1台',
+      '大光圈光學防手震變焦鏡頭 (24-70mm 恆定大光圈)',
+      '專業指向性熱靴外接收音麥克風 (含戶外防風毛罩)',
+      '專用油壓平穩阻尼三腳架 1組',
+      '高速 256GB V90 記憶卡 1張、原廠雙長效鋰電池與座充組',
+      '防震防撞專用氣密手提防護箱'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80',
+    description: '專供教師公開觀課影音錄製、教學歷程檔案拍攝、校園重大活動紀錄及微電影專題製作專用（全校共1台）。',
+    cautionNotes: '光學鏡片嚴禁用手觸摸；雨天禁止於室外無遮蔽處使用，歸還前請先備份記憶卡影像檔案。'
   },
   {
     id: 'res-doc-cam',
