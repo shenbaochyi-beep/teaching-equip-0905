@@ -259,8 +259,10 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                 <span className="font-semibold text-slate-800 truncate">{selectedApplicant.department}</span>
               </div>
               <div className="bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 text-[11px] flex flex-col justify-center">
-                <span className="text-slate-500">分機 / 公務信箱</span>
-                <span className="font-semibold text-slate-800 truncate">{selectedApplicant.phone}</span>
+                <span className="text-slate-500">公務分機 / 聯絡電話</span>
+                <span className="font-semibold text-slate-800 truncate">
+                  分機 {selectedApplicant.phone}
+                </span>
               </div>
             </div>
           </div>

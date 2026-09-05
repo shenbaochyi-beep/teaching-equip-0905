@@ -2,6 +2,7 @@ export type UserRole = 'faculty' | 'section_officer' | 'academic_director';
 
 export interface UserProfile {
   id: string;
+  username: string;
   name: string;
   role: UserRole;
   title: string;

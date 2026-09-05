@@ -12,10 +12,13 @@ import { ResourceDetailModal } from './components/ResourceDetailModal';
 import { ExtensionModal } from './components/ExtensionModal';
 import { PrintSlipModal } from './components/PrintSlipModal';
 import { ToastContainer } from './components/ToastContainer';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { ResourceItem, Reservation } from './types';
 import { motion, AnimatePresence } from 'motion/react';
+import { ShieldAlert, KeyRound } from 'lucide-react';
 
 const MainAppContent: React.FC = () => {
+  const { isAuthenticated, setIsLoginModalOpen } = useApp();
   const [activeTab, setActiveTab] = useState<string>('explore');
   
   // Modal 狀態
@@ -52,76 +55,105 @@ const MainAppContent: React.FC = () => {
         {/* 借用規則重要提示橫幅 */}
         <RulesBanner />
 
-        {/* 動態分頁內容 */}
-        <AnimatePresence mode="wait">
-          {activeTab === 'explore' && (
-            <motion.div
-              key="explore"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <ResourceExplorer
-                onSelectResource={handleSelectResource}
-                onBookResource={handleBookResource}
-              />
-            </motion.div>
-          )}
+        {/* 資安防護：未登入時提示登入驗證 */}
+        {!isAuthenticated ? (
+          <div className="bg-white rounded-2xl shadow-xl border border-rose-200 p-8 text-center max-w-xl mx-auto my-12 space-y-4 animate-in fade-in">
+            <div className="w-16 h-16 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto border border-rose-200 shadow-inner">
+              <ShieldAlert className="w-8 h-8" />
+            </div>
+            <div className="space-y-1">
+              <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 bg-rose-100 text-rose-800 rounded-full">
+                校園資通安全管制
+              </span>
+              <h2 className="text-xl font-bold text-slate-900 mt-2">
+                請先輸入教職員帳號完成身分驗證
+              </h2>
+            </div>
+            <p className="text-sm text-slate-600 leading-relaxed max-w-md mx-auto">
+              本教學設備與教室借用系統涉及校產保管與行政簽核權限，依教育部及校內資通安全規範，全體教職員必須輸入個人專屬公務帳號，需帳號完全符合名冊設定方能解鎖系統進行預約與管理操作。
+            </p>
+            <div className="pt-2">
+              <button
+                onClick={() => setIsLoginModalOpen(true)}
+                className="px-6 py-3 bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm rounded-xl shadow-md shadow-sky-600/20 transition-all inline-flex items-center gap-2"
+              >
+                <KeyRound className="w-4 h-4" />
+                開啟身分驗證登入視窗
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* 動態分頁內容 */
+          <AnimatePresence mode="wait">
+            {activeTab === 'explore' && (
+              <motion.div
+                key="explore"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ResourceExplorer
+                  onSelectResource={handleSelectResource}
+                  onBookResource={handleBookResource}
+                />
+              </motion.div>
+            )}
 
-          {activeTab === 'schedule' && (
-            <motion.div
-              key="schedule"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <CalendarScheduleView
-                onBookResource={handleBookResource}
-              />
-            </motion.div>
-          )}
+            {activeTab === 'schedule' && (
+              <motion.div
+                key="schedule"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <CalendarScheduleView
+                  onBookResource={handleBookResource}
+                />
+              </motion.div>
+            )}
 
-          {activeTab === 'my_reservations' && (
-            <motion.div
-              key="my_reservations"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <MyReservations
-                onOpenExtensionModal={handleOpenExtension}
-                onOpenPrintModal={handleOpenPrint}
-              />
-            </motion.div>
-          )}
+            {activeTab === 'my_reservations' && (
+              <motion.div
+                key="my_reservations"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <MyReservations
+                  onOpenExtensionModal={handleOpenExtension}
+                  onOpenPrintModal={handleOpenPrint}
+                />
+              </motion.div>
+            )}
 
-          {activeTab === 'section_review' && (
-            <motion.div
-              key="section_review"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <SectionReviewPanel />
-            </motion.div>
-          )}
+            {activeTab === 'section_review' && (
+              <motion.div
+                key="section_review"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <SectionReviewPanel />
+              </motion.div>
+            )}
 
-          {activeTab === 'director_approval' && (
-            <motion.div
-              key="director_approval"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <DirectorApprovalPanel />
-            </motion.div>
-          )}
-        </AnimatePresence>
+            {activeTab === 'director_approval' && (
+              <motion.div
+                key="director_approval"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <DirectorApprovalPanel />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
       </main>
 
       {/* 頁尾資訊 */}
@@ -182,8 +214,10 @@ const MainAppContent: React.FC = () => {
 
 export default function App() {
   return (
-    <AppProvider>
-      <MainAppContent />
-    </AppProvider>
+    <ErrorBoundary>
+      <AppProvider>
+        <MainAppContent />
+      </AppProvider>
+    </ErrorBoundary>
   );
 }

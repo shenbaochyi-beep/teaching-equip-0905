@@ -3,11 +3,12 @@ import { getTodayString, addDays } from '../utils/dateUtils';
 
 const today = getTodayString();
 
-// 申請教職員與管理人員資料庫 (依指示建置38位人員名單)
+// 申請教職員與管理人員資料庫 (依指示建置38位人員名單，並依資安規範設定專屬登入帳號)
 export const INITIAL_USERS: UserProfile[] = [
   // 1. 教務處審核主管 (最終主管核定)
   {
     id: 'user-director-huang',
+    username: 'slvs200',
     name: '黃寀霓 主任',
     role: 'academic_director',
     title: '教務主任',
@@ -19,6 +20,7 @@ export const INITIAL_USERS: UserProfile[] = [
   // 2. 招設組長 (設備調度、衝突查核、初審審查及實體點交)
   {
     id: 'user-officer-lin',
+    username: 'slvs230',
     name: '林彥伊 招設組長',
     role: 'section_officer',
     title: '教學設備組長 (招設組長)',
@@ -31,6 +33,7 @@ export const INITIAL_USERS: UserProfile[] = [
   // 3. 校長室秘書
   {
     id: 'user-sec-zheng',
+    username: 'slvs101',
     name: '鄭安順 秘書',
     role: 'faculty',
     title: '秘書',
@@ -43,6 +46,7 @@ export const INITIAL_USERS: UserProfile[] = [
   // 4-9. 教務處各組長與專任/兼課/特色教師
   {
     id: 'user-acad-liu',
+    username: 'slvs210',
     name: '劉泄嬉 組長',
     role: 'faculty',
     title: '教學組長',
@@ -53,6 +57,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-acad-hong',
+    username: 'slvs220',
     name: '洪菁梅 組長',
     role: 'faculty',
     title: '註冊組長',
@@ -63,6 +68,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-acad-jian',
+    username: 'slvs240',
     name: '簡詩涵 組長',
     role: 'faculty',
     title: '課務組長',
@@ -73,6 +79,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-teacher-lee',
+    username: 'slvs281',
     name: '李玉雯 老師',
     role: 'faculty',
     title: '兼課教師',
@@ -83,6 +90,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-teacher-lei',
+    username: 'slvs281',
     name: '雷藤 老師',
     role: 'faculty',
     title: '外籍教師 (Foreign Teacher)',
@@ -93,6 +101,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-teacher-cai-lang',
+    username: 'slvs281',
     name: '蔡秀珠 老師',
     role: 'faculty',
     title: '族語老師',
@@ -105,6 +114,7 @@ export const INITIAL_USERS: UserProfile[] = [
   // 10-17. 學務處主任、組長、人力與教練護理師
   {
     id: 'user-sa-hu',
+    username: 'slvs300',
     name: '胡方奕 主任',
     role: 'faculty',
     title: '學務主任',
@@ -115,6 +125,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-sa-cai',
+    username: 'slva331',
     name: '蔡足英 組長',
     role: 'faculty',
     title: '生輔組長',
@@ -125,6 +136,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-sa-yuan',
+    username: 'slvs310',
     name: '袁仕忠 組長',
     role: 'faculty',
     title: '訓育組長',
@@ -135,6 +147,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-sa-huang',
+    username: 'slvs320',
     name: '黃建堯 組長',
     role: 'faculty',
     title: '體育組長',
@@ -145,6 +158,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-sa-chen',
+    username: 'slvs323',
     name: '陳雪華 組長',
     role: 'faculty',
     title: '衛生組長',
@@ -155,6 +169,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-sa-zhang',
+    username: 'slvs332',
     name: '張健新 老師',
     role: 'faculty',
     title: '學創人力',
@@ -165,6 +180,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-sa-coach-chen',
+    username: 'slvs322',
     name: '陳誌祥 教練',
     role: 'faculty',
     title: '棒球教練',
@@ -175,6 +191,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-sa-nurse-xu',
+    username: 'slvs321',
     name: '許菊雅 護理師',
     role: 'faculty',
     title: '護理師',
@@ -187,6 +204,7 @@ export const INITIAL_USERS: UserProfile[] = [
   // 18. 總務處主任
   {
     id: 'user-ga-wang',
+    username: 'slva500',
     name: '王恩豪 主任',
     role: 'faculty',
     title: '總務主任',
@@ -199,6 +217,7 @@ export const INITIAL_USERS: UserProfile[] = [
   // 19-20. 輔導室主任與特教老師
   {
     id: 'user-guid-wei',
+    username: 'slva170',
     name: '魏頡 主任',
     role: 'faculty',
     title: '輔導室主任',
@@ -209,6 +228,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-guid-chen',
+    username: 'slvs171',
     name: '陳祐萱 老師',
     role: 'faculty',
     title: '特教老師',
@@ -221,6 +241,7 @@ export const INITIAL_USERS: UserProfile[] = [
   // 21-26. 實習處主任與五大學程主任
   {
     id: 'user-intern-xie',
+    username: 'slvs600',
     name: '謝正餘 主任',
     role: 'faculty',
     title: '實習處主任',
@@ -231,6 +252,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-intern-liu-qy',
+    username: 'slvs630',
     name: '劉瓊月 主任',
     role: 'faculty',
     title: '商業學程主任',
@@ -241,6 +263,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-intern-yang',
+    username: 'slvs660',
     name: '楊賀凱 主任',
     role: 'faculty',
     title: '資訊學程主任',
@@ -251,6 +274,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-intern-cai-xl',
+    username: 'slvs640',
     name: '蔡昕玲 主任',
     role: 'faculty',
     title: '觀光學程主任',
@@ -261,6 +285,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-intern-liu-zc',
+    username: 'slvs670',
     name: '劉宗誠 主任',
     role: 'faculty',
     title: '養殖學程主任',
@@ -271,6 +296,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-intern-liu-hr',
+    username: 'slvs650',
     name: '劉懷柔 主任',
     role: 'faculty',
     title: '餐飲學程主任',
@@ -283,6 +309,7 @@ export const INITIAL_USERS: UserProfile[] = [
   // 27-38. 導師部分 (高一4班、高二4班、高三4班)
   {
     id: 'user-home-w-wr',
+    username: 'slvs306',
     name: '王偉仁 老師',
     role: 'faculty',
     title: '一年忠班 導師',
@@ -293,6 +320,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-home-z-mx',
+    username: 'slvs305',
     name: '卓銘欣 老師',
     role: 'faculty',
     title: '一年孝班 導師',
@@ -303,6 +331,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-home-w-jr',
+    username: 'slvs309',
     name: '巫佳容 老師',
     role: 'faculty',
     title: '一年仁班 導師',
@@ -313,6 +342,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-home-d-sy',
+    username: 'slvs302',
     name: '杜斯古莎尤慕 老師',
     role: 'faculty',
     title: '一年愛班 導師',
@@ -323,6 +353,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-home-l-zm',
+    username: 'slvs304',
     name: '林政銘 老師',
     role: 'faculty',
     title: '餐飲二 導師',
@@ -333,6 +364,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-home-z-fq',
+    username: 'slvs303',
     name: '周芳琪 老師',
     role: 'faculty',
     title: '觀光二 導師',
@@ -343,6 +375,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-home-h-yy',
+    username: 'slvs312',
     name: '黃永耀 老師',
     role: 'faculty',
     title: '商資二 導師',
@@ -353,6 +386,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-home-x-dx',
+    username: 'slvs313',
     name: '熊代勛 老師',
     role: 'faculty',
     title: '養殖二 導師',
@@ -363,6 +397,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-home-x-sq',
+    username: 'slvs308',
     name: '許書齊 老師',
     role: 'faculty',
     title: '餐飲三 導師',
@@ -373,6 +408,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-home-c-zl',
+    username: 'slvs311',
     name: '陳芷琳 老師',
     role: 'faculty',
     title: '觀光三 導師',
@@ -383,6 +419,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-home-c-zm',
+    username: 'slvs301',
     name: '陳中明 老師',
     role: 'faculty',
     title: '商資三 導師',
@@ -393,6 +430,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-home-z-cj',
+    username: 'slvs307',
     name: '趙川俊 老師',
     role: 'faculty',
     title: '養殖三 導師',

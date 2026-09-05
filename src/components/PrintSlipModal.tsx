@@ -1,9 +1,11 @@
 import React from 'react';
 import { Reservation } from '../types';
+import { useApp } from '../context/AppContext';
 import { 
   Printer, 
   X, 
   Building2, 
+  School,
   CheckCircle2, 
   ShieldCheck, 
   GraduationCap, 
@@ -23,6 +25,8 @@ export const PrintSlipModal: React.FC<PrintSlipModalProps> = ({
   isOpen,
   onClose
 }) => {
+  const { customLogo } = useApp();
+
   if (!isOpen || !reservation) return null;
 
   const handlePrint = () => {
@@ -61,8 +65,27 @@ export const PrintSlipModal: React.FC<PrintSlipModalProps> = ({
           
           {/* Header */}
           <div className="text-center border-b-2 border-slate-900 pb-4 relative">
-            <div className="text-xs text-slate-500 tracking-widest font-semibold uppercase">
-              國立高級中學 · 教務處教學設備組 (招設組)
+            <div className="flex items-center justify-center gap-2 mb-1">
+              {customLogo ? (
+                <div className="w-9 h-9 rounded-lg overflow-hidden border border-slate-300 p-0.5 inline-flex items-center justify-center bg-white">
+                  <img 
+                    src={customLogo} 
+                    alt="校徽" 
+                    className="w-full h-full object-contain" 
+                    referrerPolicy="no-referrer" 
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="w-8 h-8 rounded-lg bg-slate-900 text-white inline-flex items-center justify-center">
+                  <School className="w-4 h-4" />
+                </div>
+              )}
+              <div className="text-xs text-slate-700 tracking-wider font-bold uppercase">
+                臺中市立沙鹿工業高級中等學校 · 教務處教學設備組 (招設組)
+              </div>
             </div>
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 tracking-tight">
               教學設備與專用教室借用核定通知單 (領用憑聯)

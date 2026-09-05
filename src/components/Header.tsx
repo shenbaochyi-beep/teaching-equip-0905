@@ -15,10 +15,18 @@ import {
   ChevronDown,
   Users,
   Search,
-  X
+  X,
+  KeyRound,
+  LogOut,
+  Lock,
+  LogIn,
+  School,
+  Camera
 } from 'lucide-react';
 import { getTodayString, getEarliestReservationDate } from '../utils/dateUtils';
-import { UserRole } from '../types';
+import { UserRole, UserProfile } from '../types';
+import { LoginModal } from './LoginModal';
+import { LogoModal } from './LogoModal';
 
 interface HeaderProps {
   activeTab: string;
@@ -34,17 +42,27 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
     markNotificationRead, 
     clearAllNotifications,
     stats,
-    resetToDefaultData 
+    resetToDefaultData,
+    isAuthenticated,
+    isLoginModalOpen,
+    setIsLoginModalOpen,
+    logout,
+    customLogo,
+    setIsLogoModalOpen
   } = useApp();
 
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   const [showNotifMenu, setShowNotifMenu] = useState(false);
   const [roleSearchTerm, setRoleSearchTerm] = useState('');
   const [roleCategoryFilter, setRoleCategoryFilter] = useState<'all' | 'review' | 'directors' | 'sections' | 'programs' | 'teachers' | 'homeroom'>('all');
+  const [targetUserForLogin, setTargetUserForLogin] = useState<UserProfile | null>(null);
 
   const unreadNotifs = notifications.filter(n => !n.read && (n.userId === currentUser.id || currentUser.role !== 'faculty'));
   const todayStr = getTodayString();
   const earliestDateStr = getEarliestReservationDate(todayStr);
+
+  // 判斷是否為已登入之教務主任 (具備更換與管理校徽權限)
+  const isAcademicDirector = currentUser.role === 'academic_director' && isAuthenticated;
 
   // 分類判斷邏輯
   const isReviewer = (u: typeof currentUser) => u.role === 'academic_director' || u.role === 'section_officer';
@@ -119,18 +137,70 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo & 標題 */}
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('explore')}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-500/20 border border-sky-400/30">
-              <Building2 className="w-6 h-6 text-white" />
+          <div className="flex items-center gap-3">
+            <div 
+              onClick={() => {
+                if (isAcademicDirector) {
+                  setIsLogoModalOpen(true);
+                } else {
+                  setActiveTab('explore');
+                }
+              }}
+              className={`relative ${isAcademicDirector ? 'group cursor-pointer' : 'cursor-pointer'}`}
+              title={isAcademicDirector ? "教務主任權限：點擊管理/更換系統校徽 LOGO" : "教務處教學設備與教室借用系統 (校徽已固定鎖定)"}
+            >
+              {customLogo ? (
+                <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white p-1 shadow-md shadow-sky-500/20 border border-sky-400/40 flex items-center justify-center overflow-hidden transition-all ${isAcademicDirector ? 'group-hover:scale-105 group-hover:border-amber-300' : 'hover:opacity-90'}`}>
+                  <img 
+                    src={customLogo} 
+                    alt="校徽 LOGO" 
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              ) : (
+                <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-700 flex items-center justify-center shadow-md shadow-sky-500/20 border border-sky-400/30 transition-all ${isAcademicDirector ? 'group-hover:scale-105 group-hover:border-amber-300' : 'hover:opacity-90'}`}>
+                  <School className="w-6 h-6 text-white" />
+                </div>
+              )}
+              
+              {/* 更換圖示小浮標 (僅教務主任登入後可見並操作) */}
+              {isAcademicDirector && (
+                <div 
+                  className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-amber-600 group-hover:bg-amber-500 text-white rounded-full flex items-center justify-center shadow border border-slate-900 transition-transform group-hover:scale-110"
+                  title="教務主任權限：點擊更換校徽"
+                >
+                  <Camera className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                </div>
+              )}
             </div>
+
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-base sm:text-lg tracking-tight text-white">
+                <span 
+                  onClick={() => setActiveTab('explore')}
+                  className="font-bold text-base sm:text-lg tracking-tight text-white hover:text-sky-300 transition-colors cursor-pointer"
+                >
                   教務處教學設備與教室借用系統
                 </span>
                 <span className="hidden md:inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-sky-500/20 text-sky-300 rounded border border-sky-400/30">
                   教職員專區
                 </span>
+                {/* 僅教務主任登入狀態下顯示更換按鈕 */}
+                {isAcademicDirector && (
+                  <button
+                    type="button"
+                    onClick={() => setIsLogoModalOpen(true)}
+                    className="hidden lg:inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-300 hover:text-white bg-amber-950/60 hover:bg-amber-900/80 px-2.5 py-0.5 rounded-lg border border-amber-500/40 transition-all cursor-pointer shadow-sm shadow-amber-950/30"
+                    title="教務主任專屬權限：更換標題前之校徽 LOGO"
+                  >
+                    <Camera className="w-3 h-3 text-amber-400" />
+                    更換校徽 (主任專屬)
+                  </button>
+                )}
               </div>
               <p className="text-xs text-slate-400 hidden sm:block">
                 含視聽教室、多功能教室、資源班教室及各項資訊影音設備借用管理
@@ -211,41 +281,113 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
               )}
             </div>
 
-            {/* 角色切換器 (供審核測試與實際權限切換) */}
+            {/* 角色切換與身分驗證器 */}
             <div className="relative">
-              <button
-                id="btn-role-switcher"
-                onClick={() => {
-                  setShowRoleMenu(!showRoleMenu);
-                  setShowNotifMenu(false);
-                }}
-                className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700/90 border border-slate-700 px-3 py-1.5 rounded-xl transition-all"
-              >
-                <div className={`w-7 h-7 rounded-lg ${currentUser.avatarBg} text-white flex items-center justify-center font-bold text-xs shadow-inner`}>
-                  {currentUser.name.charAt(0)}
-                </div>
-                <div className="text-left hidden sm:block">
-                  <div className="text-xs font-semibold text-slate-100 flex items-center gap-1.5">
-                    {currentUser.name}
-                    <span className={`text-[10px] px-1.5 py-0.2 rounded font-medium ${currentBadge.color}`}>
-                      {currentBadge.label}
-                    </span>
+              {!isAuthenticated ? (
+                <button
+                  id="btn-role-switcher"
+                  onClick={() => {
+                    setTargetUserForLogin(null);
+                    setIsLoginModalOpen(true);
+                  }}
+                  className="flex items-center gap-2 bg-rose-900/90 hover:bg-rose-800 text-rose-100 border border-rose-500/50 px-3 py-1.5 rounded-xl transition-all shadow-md animate-pulse"
+                >
+                  <Lock className="w-4 h-4 text-rose-300" />
+                  <span className="text-xs font-bold">資安鎖定：請登入驗證</span>
+                  <LogIn className="w-3.5 h-3.5" />
+                </button>
+              ) : (
+                <button
+                  id="btn-role-switcher"
+                  onClick={() => {
+                    setShowRoleMenu(!showRoleMenu);
+                    setShowNotifMenu(false);
+                  }}
+                  className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700/90 border border-slate-700 px-3 py-1.5 rounded-xl transition-all"
+                >
+                  <div className={`w-7 h-7 rounded-lg ${currentUser.avatarBg} text-white flex items-center justify-center font-bold text-xs shadow-inner`}>
+                    {currentUser.name.charAt(0)}
                   </div>
-                  <div className="text-[10px] text-slate-400">{currentUser.department}</div>
-                </div>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-              </button>
+                  <div className="text-left hidden sm:block">
+                    <div className="text-xs font-semibold text-slate-100 flex items-center gap-1.5">
+                      {currentUser.name}
+                      <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-600/40 flex items-center gap-1 font-semibold">
+                        <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
+                        已驗證
+                      </span>
+                      <span className={`text-[10px] px-1.5 py-0.2 rounded font-medium ${currentBadge.color}`}>
+                        {currentBadge.label}
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-slate-400 flex items-center gap-2">
+                      <span>{currentUser.department}</span>
+                      <span>·</span>
+                      <span>分機 {currentUser.phone}</span>
+                    </div>
+                  </div>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+              )}
 
-              {/* 角色選單 (全體38位教職員與行政主管切換) */}
+              {/* 角色選單 (全體38位教職員與行政主管帳號切換) */}
               {showRoleMenu && (
-                <div className="absolute right-0 mt-2 w-80 sm:w-[420px] bg-white border border-slate-200 rounded-xl shadow-2xl z-50 p-3 text-slate-800 animate-in fade-in zoom-in-95 duration-100">
+                <div className="absolute right-0 mt-2 w-80 sm:w-[440px] bg-white border border-slate-200 rounded-xl shadow-2xl z-50 p-3 text-slate-800 animate-in fade-in zoom-in-95 duration-100">
+                  {/* 當前登入資訊卡 */}
+                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl mb-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-8 h-8 rounded-lg ${currentUser.avatarBg} text-white flex items-center justify-center font-bold text-xs shadow-xs`}>
+                          {currentUser.name.charAt(0)}
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                            {currentUser.name}
+                            <span className={`text-[10px] px-1.5 py-0.2 rounded font-medium ${currentBadge.color}`}>
+                              {currentBadge.label}
+                            </span>
+                          </div>
+                          <div className="text-[10px] text-slate-500">{currentUser.department} · 分機 {currentUser.phone}</div>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded border border-emerald-300 flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                        已通過資安身分驗證
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-1 border-t border-slate-200/60">
+                      <button
+                        onClick={() => {
+                          setShowRoleMenu(false);
+                          setTargetUserForLogin(null);
+                          setIsLoginModalOpen(true);
+                        }}
+                        className="flex-1 py-1.5 px-3 bg-sky-600 hover:bg-sky-700 text-white rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 shadow-xs"
+                      >
+                        <KeyRound className="w-3.5 h-3.5" />
+                        切換教職員帳號
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowRoleMenu(false);
+                          logout();
+                        }}
+                        className="py-1.5 px-3 bg-slate-200 hover:bg-rose-100 hover:text-rose-700 text-slate-700 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                        title="安全登出當前帳號"
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                        安全登出
+                      </button>
+                    </div>
+                  </div>
+
                   <div className="px-1 py-1 text-xs font-bold text-slate-800 flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
                     <span className="flex items-center gap-1.5 text-slate-900">
                       <Users className="w-4 h-4 text-sky-600" />
-                      全校教職員與審核主管名冊 ({allUsers.length} 位)
+                      全校教職員名冊
                     </span>
                     <span className="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full font-normal">
-                      點擊切換身分
+                      共 {allUsers.length} 位
                     </span>
                   </div>
 
@@ -256,7 +398,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
                       type="text"
                       value={roleSearchTerm}
                       onChange={(e) => setRoleSearchTerm(e.target.value)}
-                      placeholder="快速搜尋姓名、職稱、班級或處室..."
+                      placeholder="快速搜尋姓名、職稱、分機或處室..."
                       className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-8 pr-7 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:bg-white"
                     />
                     {roleSearchTerm && (
@@ -302,17 +444,15 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
                       </div>
                     ) : (
                       filteredUsers.map(user => {
-                        const isSelected = user.id === currentUser.id;
+                        const isSelected = user.id === currentUser.id && isAuthenticated;
                         const badge = getRoleBadge(user.role);
                         return (
                           <button
                             key={user.id}
                             onClick={() => {
-                              setCurrentUser(user);
                               setShowRoleMenu(false);
-                              if (user.role === 'section_officer') setActiveTab('section_review');
-                              else if (user.role === 'academic_director') setActiveTab('director_approval');
-                              else setActiveTab('explore');
+                              setTargetUserForLogin(user);
+                              setIsLoginModalOpen(true);
                             }}
                             className={`w-full text-left p-2 rounded-lg flex items-center gap-2.5 transition-colors ${
                               isSelected ? 'bg-sky-50 border border-sky-300 text-sky-900 shadow-xs' : 'hover:bg-slate-50 text-slate-700'
@@ -329,17 +469,19 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
                                     {user.title}
                                   </span>
                                 </span>
-                                {isSelected ? (
-                                  <span className="text-[10px] text-sky-700 font-semibold bg-sky-100 px-1.5 py-0.2 rounded shrink-0">當前登入</span>
-                                ) : (
-                                  <span className="text-[10px] text-slate-400 shrink-0">{user.phone}</span>
-                                )}
+                                <div>
+                                  {isSelected && (
+                                    <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-100 px-1.5 py-0.2 rounded shrink-0">
+                                      登入中
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                               <div className="text-[11px] text-slate-500 truncate flex items-center gap-1.5 mt-0.5">
                                 {user.role !== 'faculty' && (
                                   <span className={`text-[10px] px-1.5 py-0.2 rounded ${badge.color}`}>{badge.label}</span>
                                 )}
-                                <span className="truncate">{user.department}</span>
+                                <span className="truncate">{user.department} · {user.phone}</span>
                               </div>
                             </div>
                           </button>
@@ -433,6 +575,19 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
           </button>
         </nav>
       </div>
+
+      {/* 資安登入驗證視窗 */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => {
+          setIsLoginModalOpen(false);
+          setTargetUserForLogin(null);
+        }}
+        targetUserHint={targetUserForLogin}
+      />
+
+      {/* 校徽 LOGO 更換視窗 */}
+      <LogoModal />
     </header>
   );
 };
