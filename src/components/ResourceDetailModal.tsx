@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { ResourceItem } from '../types';
 import { useApp } from '../context/AppContext';
 import { 
@@ -12,9 +12,7 @@ import {
   Calendar, 
   Clock, 
   Layers,
-  Sparkles,
-  Camera,
-  RotateCcw
+  Sparkles
 } from 'lucide-react';
 
 interface ResourceDetailModalProps {
@@ -30,57 +28,9 @@ export const ResourceDetailModal: React.FC<ResourceDetailModalProps> = ({
   onClose,
   onBook
 }) => {
-  const { reservations, updateResourceImage, showToast } = useApp();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { reservations } = useApp();
 
   if (!isOpen || !resource) return null;
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      showToast('error', '檔案格式錯誤', '請選擇 JPG、PNG 或 WebP 等圖片檔案。');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 1200;
-        const MAX_HEIGHT = 800;
-        let width = img.width;
-        let height = img.height;
-
-        if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
-          }
-        } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
-            height = MAX_HEIGHT;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, width, height);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-          updateResourceImage(resource.id, dataUrl);
-          showToast('success', '相片上傳成功', `${resource.name} 之實景相片已成功更新！`);
-        }
-      };
-      img.src = event.target?.result as string;
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
-  };
 
   // 取得此資源未來的預約
   const upcomingReservations = reservations
@@ -108,21 +58,6 @@ export const ResourceDetailModal: React.FC<ResourceDetailModalProps> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
           
           <div className="absolute top-4 right-4 flex items-center gap-2">
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handleFileUpload} 
-              accept="image/*" 
-              className="hidden" 
-            />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="bg-slate-900/80 hover:bg-slate-900 text-slate-200 hover:text-white px-3 py-1.5 rounded-full text-xs font-medium backdrop-blur transition-all flex items-center gap-1.5 border border-slate-700 hover:border-slate-500 shadow-sm"
-              title="上傳或更換此場地實景相片"
-            >
-              <Camera className="w-3.5 h-3.5 text-sky-400" />
-              <span>更換場地相片</span>
-            </button>
             <button
               onClick={onClose}
               className="bg-slate-900/80 hover:bg-slate-900 text-slate-300 hover:text-white p-2 rounded-full backdrop-blur transition-colors border border-slate-700 hover:border-slate-500"
