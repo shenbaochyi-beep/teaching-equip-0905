@@ -255,11 +255,11 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                           e.stopPropagation();
                           onOpenImageModal(resource);
                         }}
-                        title="上傳修訂相片"
-                        className="bg-slate-900/80 hover:bg-sky-600 text-slate-200 hover:text-white p-1 rounded backdrop-blur-sm border border-slate-700 hover:border-sky-500 shadow transition-colors flex items-center gap-1 text-[11px] px-1.5"
+                        title="上傳或更換實景相片"
+                        className="bg-slate-900/85 hover:bg-sky-600 text-slate-100 hover:text-white px-2 py-0.5 rounded backdrop-blur-sm border border-slate-700 hover:border-sky-400 shadow transition-all flex items-center gap-1 text-[11px] font-medium"
                       >
-                        <Camera className="w-3 h-3" />
-                        <span className="hidden sm:inline text-[10px]">換照</span>
+                        <Camera className="w-3 h-3 text-sky-400 group-hover/btn:text-white" />
+                        <span>上傳相片</span>
                       </button>
                     )}
                   </div>

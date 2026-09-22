@@ -12,7 +12,7 @@ import {
   Link,
   Camera
 } from 'lucide-react';
-import { LOCKED_ROOM_IMAGES } from '../data/mockData';
+import { LOCKED_ROOM_IMAGES, INITIAL_RESOURCES } from '../data/mockData';
 
 interface ResourceImageModalProps {
   resource: ResourceItem | null;
@@ -139,7 +139,7 @@ export const ResourceImageModal: React.FC<ResourceImageModalProps> = ({
   };
 
   const handleResetToDefault = () => {
-    const defaultUrl = LOCKED_ROOM_IMAGES[resource.id] || '/1.jpg';
+    const defaultUrl = LOCKED_ROOM_IMAGES[resource.id] || INITIAL_RESOURCES.find(r => r.id === resource.id)?.imageUrl || resource.imageUrl || '/1.jpg';
     setPreviewUrl(defaultUrl);
     setUrlInput(defaultUrl);
     showToast('info', '已重設為預設圖片', '點選「確認儲存修訂」後即可正式生效。');
