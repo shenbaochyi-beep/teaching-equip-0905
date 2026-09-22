@@ -173,6 +173,13 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
             <img 
               src={resource.imageUrl} 
               alt={resource.name} 
+              referrerPolicy="no-referrer"
+              onError={(e) => {
+                const target = e.currentTarget;
+                if (!target.src.includes('unsplash')) {
+                  target.src = 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=400&q=80';
+                }
+              }}
               className="w-16 h-16 rounded-lg object-cover border border-slate-200 shrink-0" 
             />
             <div className="flex-1 min-w-0">

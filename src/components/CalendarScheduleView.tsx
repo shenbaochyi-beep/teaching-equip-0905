@@ -32,7 +32,7 @@ export const CalendarScheduleView: React.FC<CalendarScheduleViewProps> = ({
 
   const filteredResources = resources.filter(r => {
     if (selectedFilter === 'rooms') {
-      return r.category === 'audiovisual_room' || r.category === 'multifunction_room' || r.category === 'resource_room' || r.category === 'special_classroom';
+      return r.category === 'audiovisual_room' || r.category === 'cooperative_room' || r.category === 'multifunction_room' || r.category === 'living_tech_room';
     }
     if (selectedFilter === 'equipment') {
       return r.category === 'it_equipment' || r.category === 'av_equipment' || r.category === 'experiment_gear';

@@ -203,7 +203,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
                 )}
               </div>
               <p className="text-xs text-slate-400 hidden sm:block">
-                含視聽教室、多功能教室、資源班教室及各項資訊影音設備借用管理
+                含視聽教室、多功能學習教室、合作學習教室、生活科技/創課教室及各項資訊影音設備借用管理
               </p>
             </div>
           </div>

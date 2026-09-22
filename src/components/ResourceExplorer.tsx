@@ -15,6 +15,7 @@ import {
   Radio, 
   Eye, 
   Sparkles,
+  Wrench,
   Info
 } from 'lucide-react';
 import { getTodayString, getEarliestReservationDate } from '../utils/dateUtils';
@@ -40,10 +41,10 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   const categories: { key: string; label: string; icon: React.ReactNode }[] = [
     { key: 'all', label: '全部項目', icon: <Layers className="w-3.5 h-3.5" /> },
     { key: 'audiovisual_room', label: '視聽教室', icon: <Building2 className="w-3.5 h-3.5 text-sky-400" /> },
-    { key: 'multifunction_room', label: '多功能教室', icon: <Sparkles className="w-3.5 h-3.5 text-indigo-400" /> },
-    { key: 'resource_room', label: '資源班教室', icon: <Users className="w-3.5 h-3.5 text-amber-400" /> },
-    { key: 'special_classroom', label: '其他專用教室', icon: <Building2 className="w-3.5 h-3.5 text-purple-400" /> },
-    { key: 'it_equipment', label: '資訊教學設備', icon: <Laptop className="w-3.5 h-3.5 text-emerald-400" /> },
+    { key: 'cooperative_room', label: '合作學習教室', icon: <Users className="w-3.5 h-3.5 text-emerald-400" /> },
+    { key: 'multifunction_room', label: '多功能學習教室', icon: <Sparkles className="w-3.5 h-3.5 text-indigo-400" /> },
+    { key: 'living_tech_room', label: '生活科技/創課教室', icon: <Wrench className="w-3.5 h-3.5 text-amber-400" /> },
+    { key: 'it_equipment', label: '資訊教學設備', icon: <Laptop className="w-3.5 h-3.5 text-blue-400" /> },
     { key: 'av_equipment', label: '影音廣播設備', icon: <Radio className="w-3.5 h-3.5 text-rose-400" /> }
   ];
 
@@ -223,6 +224,13 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   <img
                     src={resource.imageUrl}
                     alt={resource.name}
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (!target.src.includes('unsplash')) {
+                        target.src = 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=800&q=80';
+                      }
+                    }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-90"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30" />

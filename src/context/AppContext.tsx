@@ -119,6 +119,7 @@ interface AppContextType {
   
   // 資源狀態調整 (招設組維護)
   updateResourceStatus: (resourceId: string, status: ResourceItem['status']) => void;
+  updateResourceImage: (resourceId: string, newImageUrl: string) => void;
   
   // 通知
   markNotificationRead: (notificationId: string) => void;
@@ -199,20 +200,55 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const saved = safeStorage.getItem(STORAGE_KEYS.RESOURCES);
     if (!saved) return INITIAL_RESOURCES;
     const parsed = safeJsonParse<ResourceItem[]>(saved, INITIAL_RESOURCES);
-    // 自動檢測並補足新加入之項目 (如 筆記型電腦(10台)、專業攝影機1台)，並保留既有項目之借用/維修等自訂狀態
-    const existingIds = new Set(parsed.map(r => r.id));
-    const missingItems = INITIAL_RESOURCES.filter(r => !existingIds.has(r.id));
-    if (missingItems.length > 0) {
-      const merged = [...parsed, ...missingItems];
-      safeStorage.setItem(STORAGE_KEYS.RESOURCES, JSON.stringify(merged));
-      return merged;
-    }
-    return parsed;
+
+    // 依據最新 INITIAL_RESOURCES 之權威排序與設定進行同步，確保 4 間教室排於前 4 位
+    const existingMap = new Map(parsed.map(item => [item.id, item]));
+    const finalResources = INITIAL_RESOURCES.map(initial => {
+      const existing = existingMap.get(initial.id);
+      if (!existing) return initial;
+      return {
+        ...existing,
+        name: initial.name,
+        category: initial.category,
+        code: initial.code,
+        location: initial.location,
+        specs: initial.specs,
+        description: initial.description,
+        cautionNotes: initial.cautionNotes,
+        // 若為使用者在系統中上傳的自訂照片(Base64)則保留，否則更新為系統最新設定
+        imageUrl: existing.imageUrl && existing.imageUrl.startsWith('data:image') ? existing.imageUrl : initial.imageUrl
+      };
+    });
+
+    safeStorage.setItem(STORAGE_KEYS.RESOURCES, JSON.stringify(finalResources));
+    return finalResources;
   });
 
   const [reservations, setReservations] = useState<Reservation[]>(() => {
     const saved = safeStorage.getItem(STORAGE_KEYS.RESERVATIONS);
-    return safeJsonParse<Reservation[]>(saved, INITIAL_RESERVATIONS);
+    const parsed = safeJsonParse<Reservation[]>(saved, INITIAL_RESERVATIONS);
+    // 若既有預約包含已更替之資源班教室，自動對齊至合作學習教室
+    const updated = parsed.map(resv => {
+      if (resv.resourceId === 'res-resource-room') {
+        return {
+          ...resv,
+          resourceId: 'res-coop-room',
+          resourceName: '合作學習教室 (Cooperative Learning Classroom)',
+          resourceCode: 'ROOM-COOP-03',
+          resourceCategory: 'cooperative_room' as any
+        };
+      }
+      if (resv.resourceId === 'res-multi-room') {
+        return {
+          ...resv,
+          resourceName: '多功能學習教室 (Multifunctional Learning Classroom)',
+          resourceCategory: 'multifunction_room' as any
+        };
+      }
+      return resv;
+    });
+    safeStorage.setItem(STORAGE_KEYS.RESERVATIONS, JSON.stringify(updated));
+    return updated;
   });
 
   const [notifications, setNotifications] = useState<SystemNotification[]>(() => {
@@ -833,6 +869,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('info', '資源狀態已更新', '設備/教室現況已即時變更');
   };
 
+  // 場地/設備相片更換 (支援自訂相片上傳與儲存)
+  const updateResourceImage = (resourceId: string, newImageUrl: string) => {
+    setResources(prev => {
+      const updated = prev.map(r => r.id === resourceId ? { ...r, imageUrl: newImageUrl } : r);
+      safeStorage.setItem(STORAGE_KEYS.RESOURCES, JSON.stringify(updated));
+      return updated;
+    });
+    showToast('success', '相片已更新', '場地/設備相片已成功變更並儲存。');
+  };
+
   const markNotificationRead = (notificationId: string) => {
     setNotifications(prev => prev.map(n => n.id === notificationId ? { ...n, read: true } : n));
   };
@@ -915,6 +961,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         reviewExtensionBySection,
         reviewExtensionByDirector,
         updateResourceStatus,
+        updateResourceImage,
         markNotificationRead,
         clearAllNotifications,
         stats,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { ResourceItem } from '../types';
 import { useApp } from '../context/AppContext';
 import { 
@@ -12,7 +12,9 @@ import {
   Calendar, 
   Clock, 
   Layers,
-  Sparkles
+  Sparkles,
+  Camera,
+  RotateCcw
 } from 'lucide-react';
 
 interface ResourceDetailModalProps {
@@ -28,9 +30,57 @@ export const ResourceDetailModal: React.FC<ResourceDetailModalProps> = ({
   onClose,
   onBook
 }) => {
-  const { reservations } = useApp();
+  const { reservations, updateResourceImage, showToast } = useApp();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen || !resource) return null;
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      showToast('error', '檔案格式錯誤', '請選擇 JPG、PNG 或 WebP 等圖片檔案。');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 1200;
+        const MAX_HEIGHT = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          updateResourceImage(resource.id, dataUrl);
+          showToast('success', '相片上傳成功', `${resource.name} 之實景相片已成功更新！`);
+        }
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
 
   // 取得此資源未來的預約
   const upcomingReservations = reservations
@@ -42,21 +92,45 @@ export const ResourceDetailModal: React.FC<ResourceDetailModalProps> = ({
       <div className="bg-slate-900 border border-slate-700 text-slate-100 rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden my-8">
         
         {/* Header with Hero Image */}
-        <div className="relative h-56 w-full overflow-hidden bg-slate-950">
+        <div className="relative h-60 w-full overflow-hidden bg-slate-950 group">
           <img 
             src={resource.imageUrl} 
             alt={resource.name}
-            className="w-full h-full object-cover opacity-80" 
+            className="w-full h-full object-cover opacity-85 group-hover:scale-105 transition-transform duration-500" 
+            referrerPolicy="no-referrer"
+            onError={(e) => {
+              const target = e.currentTarget;
+              if (!target.src.includes('unsplash')) {
+                target.src = 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=1200&q=80';
+              }
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
           
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 bg-slate-900/80 hover:bg-slate-900 text-slate-300 hover:text-white p-2 rounded-full backdrop-blur transition-colors"
-            aria-label="關閉"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="absolute top-4 right-4 flex items-center gap-2">
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileUpload} 
+              accept="image/*" 
+              className="hidden" 
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="bg-slate-900/80 hover:bg-slate-900 text-slate-200 hover:text-white px-3 py-1.5 rounded-full text-xs font-medium backdrop-blur transition-all flex items-center gap-1.5 border border-slate-700 hover:border-slate-500 shadow-sm"
+              title="上傳或更換此場地實景相片"
+            >
+              <Camera className="w-3.5 h-3.5 text-sky-400" />
+              <span>更換場地相片</span>
+            </button>
+            <button
+              onClick={onClose}
+              className="bg-slate-900/80 hover:bg-slate-900 text-slate-300 hover:text-white p-2 rounded-full backdrop-blur transition-colors border border-slate-700 hover:border-slate-500"
+              aria-label="關閉"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
           <div className="absolute bottom-4 left-6 right-6 flex items-end justify-between">
             <div>

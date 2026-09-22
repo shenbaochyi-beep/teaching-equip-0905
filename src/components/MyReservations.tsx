@@ -141,7 +141,7 @@ export const MyReservations: React.FC<MyReservationsProps> = ({
             <Inbox className="w-12 h-12 text-slate-400 mx-auto mb-3" />
             <h3 className="text-sm font-semibold text-slate-700">目前尚無借用紀錄</h3>
             <p className="text-xs text-slate-500 mt-1">
-              請前往「設備與教室預約大廳」預約視聽教室、多功能教室、資源班教室或教學器材。
+              請前往「設備與教室預約大廳」預約視聽教室、多功能學習教室、合作學習教室、生活科技/創課教室或教學器材。
             </p>
           </div>
         ) : (

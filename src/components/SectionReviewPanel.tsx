@@ -506,7 +506,18 @@ export const SectionReviewPanel: React.FC = () => {
                 className="bg-white border border-slate-200 rounded-xl p-4 flex items-center justify-between gap-4 text-xs shadow-sm"
               >
                 <div className="flex items-center gap-3">
-                  <img src={item.imageUrl} alt={item.name} className="w-12 h-12 rounded-lg object-cover border border-slate-200 shrink-0" />
+                  <img 
+                    src={item.imageUrl} 
+                    alt={item.name} 
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (!target.src.includes('unsplash')) {
+                        target.src = 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=400&q=80';
+                      }
+                    }}
+                    className="w-12 h-12 rounded-lg object-cover border border-slate-200 shrink-0" 
+                  />
                   <div>
                     <div className="font-mono text-sky-700 text-[11px] font-semibold">{item.code}</div>
                     <div className="font-bold text-slate-900 text-sm">{item.name}</div>

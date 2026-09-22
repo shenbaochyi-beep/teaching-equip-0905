@@ -14,9 +14,9 @@ export interface UserProfile {
 
 export type ResourceCategory = 
   | 'audiovisual_room'   // 視聽教室
-  | 'multifunction_room' // 多功能教室
-  | 'resource_room'      // 資源班教室
-  | 'special_classroom'  // 其他專科教室
+  | 'multifunction_room' // 多功能學習教室
+  | 'cooperative_room'   // 合作學習教室
+  | 'living_tech_room'   // 生活科技/創課教室
   | 'av_equipment'       // 影音廣播設備
   | 'it_equipment'       // 資訊教學設備
   | 'experiment_gear';   // 教學實驗器材
