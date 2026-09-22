@@ -270,13 +270,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return found || INITIAL_USERS[0];
   });
 
-  // 資安驗證狀態 (預設若初次使用已認證，登出後需重新輸入合法帳號方可登入)
+  // 資安驗證狀態：進入系統前必須先以帳號登入驗證身分
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     const saved = safeStorage.getItem(STORAGE_KEYS.IS_AUTHENTICATED);
-    return safeJsonParse<boolean>(saved, true);
+    return safeJsonParse<boolean>(saved, false);
   });
 
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(() => {
+    const saved = safeStorage.getItem(STORAGE_KEYS.IS_AUTHENTICATED);
+    const isAuthed = safeJsonParse<boolean>(saved, false);
+    return !isAuthed;
+  });
 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
