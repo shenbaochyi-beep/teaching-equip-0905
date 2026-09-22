@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ResourceItem } from '../types';
 import { useApp } from '../context/AppContext';
+import { LOCKED_ROOM_IMAGES } from '../data/mockData';
 import { 
   getTodayString, 
   getEarliestReservationDate, 
@@ -102,7 +103,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     }
 
     if (!advanceCheck.valid) {
-      setErrorMessage(`借用須於借用日 3 日前先行登記。最早可借日期為 ${advanceCheck.minAllowedDate}。`);
+      setErrorMessage(`借用須於借用日 30 日前先行登記。最早可借日期為 ${advanceCheck.minAllowedDate}。`);
       return;
     }
 
@@ -176,6 +177,9 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               referrerPolicy="no-referrer"
               onError={(e) => {
                 const target = e.currentTarget;
+                if (resource.id in LOCKED_ROOM_IMAGES) {
+                  return;
+                }
                 if (!target.src.includes('unsplash')) {
                   target.src = 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=400&q=80';
                 }
@@ -279,7 +283,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-sky-900 flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-sky-600" />
-                借用與歸還日期排程 (落實 3 日前預約與 3 日內歸還規範)
+                借用與歸還日期排程 (落實 30 日前預約與 3 日內歸還規範)
               </span>
               <span className="text-[11px] text-slate-600">
                 借期總計：<strong className="text-sky-700 font-bold">{loanDays === 0 ? '當天歸還 (0天)' : `${loanDays} 天`}</strong>
@@ -322,7 +326,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                 {!advanceCheck.valid && (
                   <p className="text-[11px] text-rose-600 mt-1 flex items-center gap-1">
                     <AlertTriangle className="w-3 h-3 shrink-0" />
-                    未滿 3 日前預約規定（最早須為 {advanceCheck.minAllowedDate}）
+                    未滿 30 日前預約規定（最早須為 {advanceCheck.minAllowedDate}）
                   </p>
                 )}
               </div>

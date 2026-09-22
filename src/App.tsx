@@ -11,6 +11,7 @@ import { ReservationModal } from './components/ReservationModal';
 import { ResourceDetailModal } from './components/ResourceDetailModal';
 import { ExtensionModal } from './components/ExtensionModal';
 import { PrintSlipModal } from './components/PrintSlipModal';
+import { ResourceImageModal } from './components/ResourceImageModal';
 import { ToastContainer } from './components/ToastContainer';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ResourceItem, Reservation } from './types';
@@ -24,6 +25,7 @@ const MainAppContent: React.FC = () => {
   // Modal 狀態
   const [selectedResourceForDetail, setSelectedResourceForDetail] = useState<ResourceItem | null>(null);
   const [selectedResourceForBooking, setSelectedResourceForBooking] = useState<ResourceItem | null>(null);
+  const [selectedResourceForImage, setSelectedResourceForImage] = useState<ResourceItem | null>(null);
   const [selectedReservationForExtension, setSelectedReservationForExtension] = useState<Reservation | null>(null);
   const [selectedReservationForPrint, setSelectedReservationForPrint] = useState<Reservation | null>(null);
 
@@ -33,6 +35,10 @@ const MainAppContent: React.FC = () => {
 
   const handleSelectResource = (resource: ResourceItem) => {
     setSelectedResourceForDetail(resource);
+  };
+
+  const handleOpenImageModal = (resource: ResourceItem) => {
+    setSelectedResourceForImage(resource);
   };
 
   const handleOpenExtension = (res: Reservation) => {
@@ -96,6 +102,7 @@ const MainAppContent: React.FC = () => {
                 <ResourceExplorer
                   onSelectResource={handleSelectResource}
                   onBookResource={handleBookResource}
+                  onOpenImageModal={handleOpenImageModal}
                 />
               </motion.div>
             )}
@@ -187,6 +194,17 @@ const MainAppContent: React.FC = () => {
             setSelectedResourceForDetail(null);
             setSelectedResourceForBooking(res);
           }}
+          onOpenImageModal={(res) => {
+            setSelectedResourceForImage(res);
+          }}
+        />
+      )}
+
+      {selectedResourceForImage && (
+        <ResourceImageModal
+          resource={selectedResourceForImage}
+          isOpen={!!selectedResourceForImage}
+          onClose={() => setSelectedResourceForImage(null)}
         />
       )}
 

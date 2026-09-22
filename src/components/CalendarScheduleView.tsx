@@ -51,7 +51,7 @@ export const CalendarScheduleView: React.FC<CalendarScheduleViewProps> = ({
             全校專用教室與教學設備 — 檔期借用現況總覽
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            可預先查詢各教室與設備各日期之閒置與借用狀態；依校規，點選 <strong className="text-amber-600 font-bold">{earliestDateStr}</strong> 之後的日期即可進行 3 日前線上預約。
+            可預先查詢各教室與設備各日期之閒置與借用狀態；依校規，點選 <strong className="text-amber-600 font-bold">{earliestDateStr}</strong> 之後的日期即可進行 30 日前線上預約。
           </p>
         </div>
 
@@ -89,9 +89,16 @@ export const CalendarScheduleView: React.FC<CalendarScheduleViewProps> = ({
             </button>
             <button
               onClick={() => setDateOffset(0)}
-              className="px-2 py-1 text-xs text-slate-700 hover:text-slate-900 font-semibold"
+              className={`px-2 py-1 text-xs font-semibold rounded-md ${dateOffset === 0 ? 'bg-white shadow-xs text-sky-700' : 'text-slate-700 hover:text-slate-900'}`}
             >
               本週
+            </button>
+            <button
+              onClick={() => setDateOffset(30)}
+              className={`px-2 py-1 text-xs font-semibold rounded-md ${dateOffset === 30 ? 'bg-white shadow-xs text-amber-700 font-bold' : 'text-amber-700 hover:text-amber-900'}`}
+              title="快速跳轉至30天後最早可預約週"
+            >
+              最早可約週 (30天後)
             </button>
             <button
               onClick={() => setDateOffset(prev => prev + 7)}
@@ -109,7 +116,7 @@ export const CalendarScheduleView: React.FC<CalendarScheduleViewProps> = ({
         <span className="font-semibold text-slate-800">圖例狀態說明：</span>
         <div className="flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-full bg-emerald-500/20 border border-emerald-500" />
-          <span>🟢 閒置可借用 (提前3日可點選預約)</span>
+          <span>🟢 閒置可借用 (提前30日可點選預約)</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-full bg-amber-500/20 border border-amber-500" />
@@ -121,7 +128,7 @@ export const CalendarScheduleView: React.FC<CalendarScheduleViewProps> = ({
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-full bg-slate-200 border border-slate-300" />
-          <span>⚪ 未達3日前預約規範日</span>
+          <span>⚪ 未達30日前預約規範日</span>
         </div>
       </div>
 
@@ -223,7 +230,7 @@ export const CalendarScheduleView: React.FC<CalendarScheduleViewProps> = ({
                         ) : (
                           <div className="py-2.5 px-1 text-slate-400 text-[10px] text-center">
                             <span>-</span>
-                            <div className="text-[8px] text-slate-400">未滿3天</div>
+                            <div className="text-[8px] text-slate-400">未滿30天</div>
                           </div>
                         )}
                       </td>

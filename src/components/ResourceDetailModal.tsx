@@ -1,6 +1,7 @@
 import React from 'react';
 import { ResourceItem } from '../types';
 import { useApp } from '../context/AppContext';
+import { LOCKED_ROOM_IMAGES } from '../data/mockData';
 import { 
   Building, 
   MapPin, 
@@ -12,7 +13,8 @@ import {
   Calendar, 
   Clock, 
   Layers,
-  Sparkles
+  Sparkles,
+  Camera
 } from 'lucide-react';
 
 interface ResourceDetailModalProps {
@@ -20,13 +22,15 @@ interface ResourceDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   onBook: (resource: ResourceItem) => void;
+  onOpenImageModal?: (resource: ResourceItem) => void;
 }
 
 export const ResourceDetailModal: React.FC<ResourceDetailModalProps> = ({
   resource,
   isOpen,
   onClose,
-  onBook
+  onBook,
+  onOpenImageModal
 }) => {
   const { reservations } = useApp();
 
@@ -42,22 +46,36 @@ export const ResourceDetailModal: React.FC<ResourceDetailModalProps> = ({
       <div className="bg-slate-900 border border-slate-700 text-slate-100 rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden my-8">
         
         {/* Header with Hero Image */}
-        <div className="relative h-60 w-full overflow-hidden bg-slate-950 group">
+        <div className="relative h-64 sm:h-72 w-full overflow-hidden bg-slate-900 group">
           <img 
             src={resource.imageUrl} 
             alt={resource.name}
-            className="w-full h-full object-cover opacity-85 group-hover:scale-105 transition-transform duration-500" 
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
             referrerPolicy="no-referrer"
             onError={(e) => {
               const target = e.currentTarget;
+              if (resource.id in LOCKED_ROOM_IMAGES) {
+                return;
+              }
               if (!target.src.includes('unsplash')) {
                 target.src = 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=1200&q=80';
               }
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent pointer-events-none" />
           
           <div className="absolute top-4 right-4 flex items-center gap-2">
+            {onOpenImageModal && (
+              <button
+                type="button"
+                onClick={() => onOpenImageModal(resource)}
+                className="bg-slate-900/80 hover:bg-sky-600 text-slate-200 hover:text-white px-3 py-1.5 rounded-full backdrop-blur transition-all border border-slate-700 hover:border-sky-500 text-xs font-semibold flex items-center gap-1.5 shadow"
+                title="上傳或更換實景照片"
+              >
+                <Camera className="w-3.5 h-3.5" />
+                <span>修訂相片</span>
+              </button>
+            )}
             <button
               onClick={onClose}
               className="bg-slate-900/80 hover:bg-slate-900 text-slate-300 hover:text-white p-2 rounded-full backdrop-blur transition-colors border border-slate-700 hover:border-slate-500"
@@ -186,7 +204,7 @@ export const ResourceDetailModal: React.FC<ResourceDetailModalProps> = ({
               className="px-5 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition-colors shadow-md flex items-center gap-1.5"
             >
               <Calendar className="w-4 h-4" />
-              立即登記借用 (提前3日預約)
+              立即登記借用 (提前30日預約)
             </button>
           </div>
         </div>

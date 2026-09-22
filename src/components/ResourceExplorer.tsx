@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ResourceItem, ResourceCategory, ResourceStatus } from '../types';
 import { useApp } from '../context/AppContext';
+import { LOCKED_ROOM_IMAGES } from '../data/mockData';
 import { 
   Search, 
   Filter, 
@@ -16,18 +17,22 @@ import {
   Eye, 
   Sparkles,
   Wrench,
-  Info
+  Info,
+  Camera,
+  Upload
 } from 'lucide-react';
 import { getTodayString, getEarliestReservationDate } from '../utils/dateUtils';
 
 interface ResourceExplorerProps {
   onSelectResource: (resource: ResourceItem) => void;
   onBookResource: (resource: ResourceItem) => void;
+  onOpenImageModal?: (resource: ResourceItem) => void;
 }
 
 export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   onSelectResource,
-  onBookResource
+  onBookResource,
+  onOpenImageModal
 }) => {
   const { resources, reservations } = useApp();
   
@@ -220,25 +225,44 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                 className="bg-white border border-slate-200 hover:border-slate-300 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col group"
               >
                 {/* 圖片與頂部狀態徽章 */}
-                <div className="relative h-44 w-full bg-slate-900 overflow-hidden cursor-pointer" onClick={() => onSelectResource(resource)}>
+                <div className="relative h-44 w-full bg-slate-100 overflow-hidden cursor-pointer" onClick={() => onSelectResource(resource)}>
                   <img
                     src={resource.imageUrl}
                     alt={resource.name}
                     referrerPolicy="no-referrer"
                     onError={(e) => {
                       const target = e.currentTarget;
+                      if (resource.id in LOCKED_ROOM_IMAGES) {
+                        return;
+                      }
                       if (!target.src.includes('unsplash')) {
                         target.src = 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=800&q=80';
                       }
                     }}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-90"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent pointer-events-none" />
 
-                  {/* 財產編號 */}
-                  <span className="absolute top-3 left-3 bg-slate-900/90 backdrop-blur-sm text-sky-300 text-[11px] font-mono font-semibold px-2 py-0.5 rounded border border-slate-700 shadow">
-                    {resource.code}
-                  </span>
+                  {/* 財產編號與更換相片按鈕 */}
+                  <div className="absolute top-3 left-3 flex items-center gap-1.5 z-10">
+                    <span className="bg-slate-900/90 backdrop-blur-sm text-sky-300 text-[11px] font-mono font-semibold px-2 py-0.5 rounded border border-slate-700 shadow">
+                      {resource.code}
+                    </span>
+                    {onOpenImageModal && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onOpenImageModal(resource);
+                        }}
+                        title="上傳修訂相片"
+                        className="bg-slate-900/80 hover:bg-sky-600 text-slate-200 hover:text-white p-1 rounded backdrop-blur-sm border border-slate-700 hover:border-sky-500 shadow transition-colors flex items-center gap-1 text-[11px] px-1.5"
+                      >
+                        <Camera className="w-3 h-3" />
+                        <span className="hidden sm:inline text-[10px]">換照</span>
+                      </button>
+                    )}
+                  </div>
 
                   {/* 閒置/使用中狀態標籤 */}
                   <div className="absolute top-3 right-3">

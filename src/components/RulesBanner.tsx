@@ -38,7 +38,7 @@ export const RulesBanner: React.FC = () => {
             設備/教室借用規定重點提醒
           </h2>
           <p className="text-xs sm:text-sm text-blue-100/90 mt-1 max-w-3xl leading-relaxed">
-            借用設備一律為學校教職員；請先查詢設備或教室閒置狀態，<strong>須於借用日3日前先行登記</strong>，借用後<strong>須於3日內歸還</strong>。如有特殊教學需求延長，請填具「特殊原因延長借用申請」，經教務處招設組審查、教務主任核定。
+            借用設備一律為學校教職員；請先查詢設備或教室閒置狀態，<strong>須於借用日30日前先行登記</strong>，借用後<strong>須於3日內歸還</strong>。如有特殊教學需求延長，請填具「特殊原因延長借用申請」，經教務處招設組審查、教務主任核定。
           </p>
         </div>
 
@@ -73,12 +73,12 @@ export const RulesBanner: React.FC = () => {
             <CalendarClock className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-xs font-bold text-amber-300">提前 3 日登記預約</div>
+            <div className="text-xs font-bold text-amber-300">提前 30 日登記預約</div>
             <div className="text-xs text-slate-200 mt-0.5 font-medium">
               最早可借日：<span className="text-amber-300 font-bold">{earliestDateStr}</span>
             </div>
             <div className="text-[11px] text-slate-400 mt-1 leading-snug">
-              系統嚴格防呆，借用前須預留 3 日供招設組調配檢測與簽核。
+              系統嚴格防呆，借用前須預留 30 日供招設組調配檢測與簽核。
             </div>
           </div>
         </div>
@@ -123,7 +123,7 @@ export const RulesBanner: React.FC = () => {
             <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-700">
               <span className="text-[10px] text-sky-400 font-bold uppercase">步驟 1</span>
               <div className="font-semibold text-slate-200 mt-1">線上查詢與預約登記</div>
-              <p className="text-[11px] text-slate-400 mt-1">教職員於借用日3日前查詢閒置狀態並填寫借用單。</p>
+              <p className="text-[11px] text-slate-400 mt-1">教職員於借用日30日前查詢閒置狀態並填寫借用單。</p>
             </div>
             <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-700">
               <span className="text-[10px] text-sky-400 font-bold uppercase">步驟 2</span>

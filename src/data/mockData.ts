@@ -441,6 +441,13 @@ export const INITIAL_USERS: UserProfile[] = [
   }
 ];
 
+export const LOCKED_ROOM_IMAGES: Record<string, string> = {
+  'res-av-room': '/1.jpg',
+  'res-coop-room': '/合作.jpg',
+  'res-multi-room': '/543374.jpg',
+  'res-living-tech-room': '/創課.jpg'
+};
+
 export const INITIAL_RESOURCES: ResourceItem[] = [
   {
     id: 'res-av-room',
@@ -460,7 +467,7 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
       '靜音微風循環扇與高頻護眼 LED 筒燈照明',
       '專業劇院級環繞音響擴大機與全遮光隔音簾'
     ],
-    imageUrl: '/543378.jpg',
+    imageUrl: LOCKED_ROOM_IMAGES['res-av-room'],
     description: '適用於全校性公開授課、專題講座、教學觀摩、視聽教學與大型影音成果發表會。',
     cautionNotes: '使用完畢請落實關閉音響環控主機與投影機散熱電源，嚴禁在室內攜帶含糖飲料與熱食。'
   },
@@ -482,7 +489,7 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
       '大面積採光通風窗戶 (配置遮光百葉簾) 與實木收納矮櫃',
       '天花板懸吊式高流明投影機、三葉節能吊扇與護眼格柵燈具'
     ],
-    imageUrl: '/coop_classroom.jpg',
+    imageUrl: LOCKED_ROOM_IMAGES['res-coop-room'],
     description: '專供分組合作學習、PBL問題導向專題研討、學生同儕互評、公開觀議課及跨學科協同教學使用。',
     cautionNotes: '分組桌椅使用完畢請歸位整齊，關閉大螢幕、投影機、冷氣及電燈電源，場地清潔復原。'
   },
@@ -504,7 +511,7 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
       '室內專用直立式教學鋼琴 (支援藝文與多元研習)',
       '天花板護眼照明燈具與全室靜音旋轉循環扇'
     ],
-    imageUrl: '/543374.jpg',
+    imageUrl: LOCKED_ROOM_IMAGES['res-multi-room'],
     description: '專為跨領域素養導向教學、分組研討、研習會議及多元教學活動設計之寬敞多功能教室。',
     cautionNotes: '使用完畢請將桌椅復原整齊，關閉冷氣、電燈、循環扇與電器設備並將黑板清理乾淨。'
   },
@@ -526,29 +533,9 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
       '數位桌上型雷射雕刻機與自造創客 (Maker) 實作機具工作站',
       '天花板懸吊式護眼照明燈具、多葉節能吊扇與壁掛式擴音喇叭'
     ],
-    imageUrl: '/maker_classroom.jpg',
+    imageUrl: LOCKED_ROOM_IMAGES['res-living-tech-room'],
     description: '提供高中生活科技課程、創客自造專題、科技素養實作、機構結構設計與跨領域 STEAM 創思模型製作。',
     cautionNotes: '操作機具請遵守安全守則；使用完畢請落實關閉觸控大螢幕、電燈、吊扇電源，維護機具與場地清潔復原。'
-  },
-  {
-    id: 'res-ipad-cart',
-    name: '行動學習 iPad 平板推車組 (30台組)',
-    category: 'it_equipment',
-    code: 'EQ-PAD-01',
-    location: '教務處 招設組設備室 (櫃A-03)',
-    quantity: 3,
-    availableQuantity: 2,
-    status: 'available',
-    custodian: '教務處招設組',
-    specs: [
-      'Apple iPad 10.9吋 30台 (含防摔保護套)',
-      '智慧定時紫外線殺菌充電管理推車',
-      '預載教育部教育雲、Google Classroom 與學習吧 APP',
-      'Apple Pencil 手寫筆 30支'
-    ],
-    imageUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
-    description: '班級數位融入教學、生生用平板課堂互動即時回饋專用設備。',
-    cautionNotes: '班級數位融入教學、生生用平板課堂互動即時回饋專用設備。'
   },
   {
     id: 'res-laptop-batch',
@@ -595,7 +582,7 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
   },
   {
     id: 'res-doc-cam',
-    name: '4K Ultra HD 專業實物投影機',
+    name: '專業實務投影機',
     category: 'it_equipment',
     code: 'EQ-DCAM-05',
     location: '教務處 招設組設備室 (架B-02)',
@@ -632,66 +619,6 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     imageUrl: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=800&q=80',
     description: '戶外教學、校慶彩排、體育競賽、大型集會及川堂公開宣導專用。',
     cautionNotes: '使用完畢請務必關閉麥克風電池開關，主機插電充電至指示燈轉綠。'
-  },
-  {
-    id: 'res-4k-camera',
-    name: '4K 數位攝影機錄影套件 (含專業油壓腳架)',
-    category: 'av_equipment',
-    code: 'EQ-CAM-08',
-    location: '教務處 招設組設備室 (防潮箱D-01)',
-    quantity: 2,
-    availableQuantity: 2,
-    status: 'available',
-    custodian: '教務處招設組',
-    specs: [
-      'Sony 4K HDR 專業攝影主機 (含 20x 光學變焦)',
-      '專業油壓阻尼三腳架 (平穩運鏡)',
-      '指向性熱靴外接防風麥克風',
-      '128GB 高速 UHS-II 記憶卡 2張 + 原廠雙電池與充電器'
-    ],
-    imageUrl: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80',
-    description: '公開觀議課完整錄影存檔、校園教學微電影比賽、教學檔案競賽拍攝。',
-    cautionNotes: '鏡頭請勿用手碰觸，雨天請加裝防雨罩，歸還時請確認影像已匯出備份。'
-  },
-  {
-    id: 'res-vr-gear',
-    name: 'VR 沉浸式元宇宙教學頭戴套件 (8組入)',
-    category: 'it_equipment',
-    code: 'EQ-VR-03',
-    location: '教務處 招設組設備室 (專用安全箱VR-01)',
-    quantity: 2,
-    availableQuantity: 2,
-    status: 'available',
-    custodian: '教務處招設組',
-    specs: [
-      'Meta Quest 3 一體式 VR 頭戴裝置 8組',
-      '雙手控制器與專用防落手繩',
-      '教師端中控監看 iPad 平板 (可同步觀看學生視角)',
-      '專用 UV-C 紫外線光學防菌消毒安全收納箱'
-    ],
-    imageUrl: 'https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=800&q=80',
-    description: '地理虛擬實境考察、天文太空探險、人體解剖微觀探索等沉浸式課程。',
-    cautionNotes: '使用前請確實清潔學生面部與手部，使用後請啟動收納箱紫外線消毒。'
-  },
-  {
-    id: 'res-presenter',
-    name: '多功能雙光束數位簡報筆 (含空中滑鼠)',
-    category: 'it_equipment',
-    code: 'EQ-PRE-12',
-    location: '教務處 招設組設備室 (抽屜A-01)',
-    quantity: 10,
-    availableQuantity: 9,
-    status: 'available',
-    custodian: '教務處招設組',
-    specs: [
-      '雙光束 (高亮度綠光 + 液晶螢幕專用數位光斑)',
-      '支援空中飛鼠手勢翻頁與螢幕畫筆標註',
-      'Type-C 快速充電，內建倒數震動提示',
-      '有效遙控距離達 50 公尺'
-    ],
-    imageUrl: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80',
-    description: '教師公開課簡報、專題研討、研習會議主持等精準控制。',
-    cautionNotes: '雷射光束切勿直射人眼，歸還請一併繳回 USB 無線接收器。'
   }
 ];
 
@@ -714,9 +641,9 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
     courseName: '餐飲專題實作',
     targetClass: '餐飲三全體學生',
     estimatedAttendees: 95,
-    startDate: addDays(today, 4),
+    startDate: addDays(today, 32),
     startTime: '09:00',
-    expectedReturnDate: addDays(today, 5),
+    expectedReturnDate: addDays(today, 34),
     expectedReturnTime: '17:00',
     status: 'approved',
     submittedAt: `${today} 08:30`,
@@ -732,7 +659,7 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
         step: 'submission',
         actorName: '許書齊 老師',
         actorRole: '申請人 (餐飲三 導師)',
-        action: '送出借用預約申請單 (提前4天登記，預計借用2天)',
+        action: '送出借用預約申請單 (提前32天登記，預計借用2天)',
         timestamp: `${today} 08:30`,
         statusChange: '待招設組審核'
       },
@@ -775,9 +702,9 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
     courseName: '高中國語文 (跨領域選修)',
     targetClass: '一年孝班全體學生',
     estimatedAttendees: 40,
-    startDate: addDays(today, 3),
+    startDate: addDays(today, 30),
     startTime: '13:30',
-    expectedReturnDate: addDays(today, 4),
+    expectedReturnDate: addDays(today, 32),
     expectedReturnTime: '16:30',
     status: 'section_approved',
     submittedAt: `${today} 11:20`,
@@ -790,7 +717,7 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
         step: 'submission',
         actorName: '卓銘欣 老師',
         actorRole: '申請人 (一年孝班 導師)',
-        action: '送出多功能教室借用申請 (提前3天登記)',
+        action: '送出多功能教室借用申請 (提前30天登記)',
         timestamp: `${today} 11:20`,
         statusChange: '待招設組審核'
       },
@@ -801,7 +728,7 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
         actorRole: '教務處招設組承辦人',
         action: '初審核可，呈送黃寀霓教務主任最終裁決',
         timestamp: `${today} 13:40`,
-        comment: '符合3天前登記與3天內歸還規定。',
+        comment: '符合30天前登記與3天內歸還規定。',
         statusChange: '待教務主任核定'
       }
     ]
@@ -809,9 +736,9 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
   {
     id: 'resv-003',
     trackingNumber: 'EDU-20260830-303',
-    resourceId: 'res-ipad-cart',
-    resourceName: '行動學習 iPad 平板推車組 (30台組)',
-    resourceCode: 'EQ-PAD-01',
+    resourceId: 'res-laptop-batch',
+    resourceName: '筆記型電腦 (10台)',
+    resourceCode: 'EQ-NB-10',
     resourceCategory: 'it_equipment',
     applicantId: 'user-acad-liu',
     applicantName: '劉泄嬉 組長',
@@ -819,7 +746,7 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
     applicantDepartment: '教務處 教學組',
     applicantPhone: '分機 210',
     applicantEmail: 'xh.liu@school.edu.tw',
-    purpose: '全校公開觀議課與數位教學評量示範 — 生生用平板融入教學',
+    purpose: '全校公開觀議課與數位教學評量示範 — 筆電數位教學融入觀摩',
     courseName: '全校示範公開課',
     targetClass: '跨學程示範班級觀摩',
     estimatedAttendees: 30,
@@ -842,10 +769,10 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
       originalReturnDate: addDays(today, 2),
       requestedReturnDate: addDays(today, 6),
       daysExtended: 4,
-      reason: '【特殊原因申請】因配合教育部數位前瞻計畫訪視與全校跨科觀課成果展演，需延長使用平板推車進行連續性課堂觀測與評量數據留存，懇請准予延長借用4日。',
+      reason: '【特殊原因申請】因配合教育部數位前瞻計畫訪視與全校跨科觀課成果展演，需延長使用筆記型電腦進行連續性課堂觀測與評量數據留存，懇請准予延長借用4日。',
       submittedAt: today + ' 14:30',
       sectionStatus: 'approved',
-      sectionNote: '經查下週平板推車尚有第2組可供其他班級調度，無時段衝突，建議准予延長。',
+      sectionNote: '經查下週筆記型電腦尚有餘裕可供其他班級調度，無時段衝突，建議准予延長。',
       sectionReviewer: '林彥伊 招設組長',
       sectionReviewedAt: today + ' 15:10',
       directorStatus: 'pending'
@@ -883,7 +810,7 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
         step: 'checkout',
         actorName: '林彥伊 招設組長',
         actorRole: '教務處招設組承辦人',
-        action: '實體設備點交領取確認 (iPad推車 1 組 30 台)',
+        action: '實體設備點交領取確認 (筆記型電腦 10台組與專用充電箱)',
         timestamp: today + ' 08:00',
         statusChange: '使用中 (已領取)'
       },
@@ -925,9 +852,9 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
     courseName: '校務發展諮詢',
     targetClass: '各處室同仁與諮詢委員',
     estimatedAttendees: 12,
-    startDate: addDays(today, 5),
+    startDate: addDays(today, 35),
     startTime: '08:30',
-    expectedReturnDate: addDays(today, 7),
+    expectedReturnDate: addDays(today, 37),
     expectedReturnTime: '12:00',
     status: 'pending_section',
     submittedAt: `${today} 15:00`,
@@ -937,7 +864,7 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
         step: 'submission',
         actorName: '鄭安順 秘書',
         actorRole: '申請人 (秘書)',
-        action: '送出合作學習教室借用登記單 (提前5天預約登記)',
+        action: '送出合作學習教室借用登記單 (提前35天預約登記)',
         timestamp: `${today} 15:00`,
         statusChange: '待招設組業務審核'
       }
@@ -970,7 +897,7 @@ export const INITIAL_NOTIFICATIONS: SystemNotification[] = [
     id: 'notif-3',
     userId: 'user-director-huang',
     title: '待核定借用與延長案',
-    message: '您有 1 筆待核定一般借用案 (多功能學習教室 - 卓銘欣老師) 及 1 筆特殊原因延長借用案 (iPad推車組 - 劉泄嬉組長) 待批示。',
+    message: '您有 1 筆待核定一般借用案 (多功能學習教室 - 卓銘欣老師) 及 1 筆特殊原因延長借用案 (筆記型電腦組 - 劉泄嬉組長) 待批示。',
     type: 'urgent',
     timestamp: '今天 15:15',
     read: false

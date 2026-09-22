@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Reservation, ResourceItem } from '../types';
 import { useApp } from '../context/AppContext';
+import { LOCKED_ROOM_IMAGES } from '../data/mockData';
 import { 
   ShieldCheck, 
   CheckCircle2, 
@@ -163,7 +164,7 @@ export const SectionReviewPanel: React.FC = () => {
               待招設組業務審查之預約申請單 ({pendingReservations.length})
             </h3>
             <span className="text-xs text-slate-500">
-              審查要點：核對3日前登記規範、借用天數上限3日、設備妥善率及有無衝堂
+              審查要點：核對30日前登記規範、借用天數上限3日、設備妥善率及有無衝堂
             </span>
           </div>
 
@@ -512,6 +513,9 @@ export const SectionReviewPanel: React.FC = () => {
                     referrerPolicy="no-referrer"
                     onError={(e) => {
                       const target = e.currentTarget;
+                      if (item.id in LOCKED_ROOM_IMAGES) {
+                        return;
+                      }
                       if (!target.src.includes('unsplash')) {
                         target.src = 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=400&q=80';
                       }

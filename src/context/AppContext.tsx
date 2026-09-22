@@ -12,7 +12,8 @@ import {
   INITIAL_USERS, 
   INITIAL_RESOURCES, 
   INITIAL_RESERVATIONS, 
-  INITIAL_NOTIFICATIONS 
+  INITIAL_NOTIFICATIONS,
+  LOCKED_ROOM_IMAGES
 } from '../data/mockData';
 import { 
   getTodayString, 
@@ -143,12 +144,12 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const STORAGE_KEYS = {
-  RESOURCES: 'school_equip_resources_v6',
-  RESERVATIONS: 'school_equip_reservations_v6',
-  NOTIFICATIONS: 'school_equip_notifications_v6',
-  CURRENT_USER_ID: 'school_equip_current_user_id_v6',
-  IS_AUTHENTICATED: 'school_equip_is_authenticated_v6',
-  CUSTOM_LOGO: 'school_equip_custom_logo_v6'
+  RESOURCES: 'school_equip_resources_v14',
+  RESERVATIONS: 'school_equip_reservations_v14',
+  NOTIFICATIONS: 'school_equip_notifications_v14',
+  CURRENT_USER_ID: 'school_equip_current_user_id_v14',
+  IS_AUTHENTICATED: 'school_equip_is_authenticated_v14',
+  CUSTOM_LOGO: 'school_equip_custom_logo_v14'
 };
 
 // 安全 Storage 存取封裝，防範 iframe 隱私限制或配額超過引發之 Uncaught 錯誤
@@ -190,18 +191,17 @@ function safeJsonParse<T>(jsonString: string | null, fallback: T): T {
 }
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // 載入持久化或預設資料 (具備容錯與防崩潰機制)
+  // 載入持久化或預設資料 (具備容錯與防崩潰機制，平滑繼承已設定之校徽)
   const [customLogo, setCustomLogo] = useState<string | null>(() => {
-    return safeStorage.getItem(STORAGE_KEYS.CUSTOM_LOGO);
+    return safeStorage.getItem(STORAGE_KEYS.CUSTOM_LOGO) || safeStorage.getItem('school_equip_custom_logo_v13') || safeStorage.getItem('school_equip_custom_logo_v12');
   });
   const [isLogoModalOpen, setIsLogoModalOpen] = useState<boolean>(false);
 
   const [resources, setResources] = useState<ResourceItem[]>(() => {
     const saved = safeStorage.getItem(STORAGE_KEYS.RESOURCES);
-    if (!saved) return INITIAL_RESOURCES;
-    const parsed = safeJsonParse<ResourceItem[]>(saved, INITIAL_RESOURCES);
+    const parsed = saved ? safeJsonParse<ResourceItem[]>(saved, INITIAL_RESOURCES) : INITIAL_RESOURCES;
 
-    // 依據最新 INITIAL_RESOURCES 之權威排序與設定進行同步，確保 4 間教室排於前 4 位
+    // 依據最新 INITIAL_RESOURCES 之權威排序與設定進行同步，確保 4 間教室排於前 4 位且可自訂實景相片
     const existingMap = new Map(parsed.map(item => [item.id, item]));
     const finalResources = INITIAL_RESOURCES.map(initial => {
       const existing = existingMap.get(initial.id);
@@ -215,8 +215,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         specs: initial.specs,
         description: initial.description,
         cautionNotes: initial.cautionNotes,
-        // 若為使用者在系統中上傳的自訂照片(Base64)則保留，否則更新為系統最新設定
-        imageUrl: existing.imageUrl && existing.imageUrl.startsWith('data:image') ? existing.imageUrl : initial.imageUrl
+        imageUrl: existing.imageUrl || initial.imageUrl
       };
     });
 
@@ -227,7 +226,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [reservations, setReservations] = useState<Reservation[]>(() => {
     const saved = safeStorage.getItem(STORAGE_KEYS.RESERVATIONS);
     const parsed = safeJsonParse<Reservation[]>(saved, INITIAL_RESERVATIONS);
-    // 若既有預約包含已更替之資源班教室，自動對齊至合作學習教室
+    // 若既有預約包含已更替之資源班教室，自動對齊至合作學習教室；若有舊平板推車預約，對齊至筆電
     const updated = parsed.map(resv => {
       if (resv.resourceId === 'res-resource-room') {
         return {
@@ -236,6 +235,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           resourceName: '合作學習教室 (Cooperative Learning Classroom)',
           resourceCode: 'ROOM-COOP-03',
           resourceCategory: 'cooperative_room' as any
+        };
+      }
+      if (resv.resourceId === 'res-ipad-cart') {
+        return {
+          ...resv,
+          resourceId: 'res-laptop-batch',
+          resourceName: '筆記型電腦 (10台)',
+          resourceCode: 'EQ-NB-10',
+          resourceCategory: 'it_equipment' as any
         };
       }
       if (resv.resourceId === 'res-multi-room') {
@@ -413,12 +421,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     const todayStr = getTodayString();
     
-    // 規則1: 必須於借用日 3 日前先行登記
+    // 規則1: 必須於借用日 30 日前先行登記
     const advanceCheck = isValidAdvanceBookingDate(data.startDate, todayStr);
     if (!advanceCheck.valid) {
       return {
         success: false,
-        error: `不符合借用規定：設備與教室預約須於借用日前 3 天登記。今日為 ${todayStr}，最早可登記借用日為 ${advanceCheck.minAllowedDate}。`
+        error: `不符合借用規定：設備與教室預約須於借用日前 30 天登記。今日為 ${todayStr}，最早可登記借用日為 ${advanceCheck.minAllowedDate}。`
       };
     }
 
@@ -468,7 +476,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           step: 'submission',
           actorName: applicant.name,
           actorRole: `${applicant.title} (${applicant.department})`,
-          action: '送出借用登記申請 (符合借用前3日預約規定)',
+          action: '送出借用登記申請 (符合借用前30日預約規定)',
           timestamp: nowTimeStr,
           statusChange: '待招設組業務審核'
         }
@@ -869,14 +877,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('info', '資源狀態已更新', '設備/教室現況已即時變更');
   };
 
-  // 場地/設備相片更換 (支援自訂相片上傳與儲存)
+  // 場地/設備相片更換（支援各專用教室與各教學設備自訂實景相片上傳）
   const updateResourceImage = (resourceId: string, newImageUrl: string) => {
     setResources(prev => {
       const updated = prev.map(r => r.id === resourceId ? { ...r, imageUrl: newImageUrl } : r);
       safeStorage.setItem(STORAGE_KEYS.RESOURCES, JSON.stringify(updated));
       return updated;
     });
-    showToast('success', '相片已更新', '場地/設備相片已成功變更並儲存。');
+    showToast('success', '場地實景相片已成功修訂', '系統總覽卡片、詳細規格與預約單將同步以此圖片呈現。');
   };
 
   const markNotificationRead = (notificationId: string) => {
@@ -899,11 +907,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     safeStorage.removeItem(STORAGE_KEYS.RESOURCES);
     safeStorage.removeItem(STORAGE_KEYS.RESERVATIONS);
     safeStorage.removeItem(STORAGE_KEYS.NOTIFICATIONS);
-    // 注意：校徽 LOGO 已由教務處固定鎖定，不隨測試資料重設而清除
+    // 注意：四大教室實景相片與校徽已全數固定鎖定，不隨測試資料重設而清除或變動
     setResources(INITIAL_RESOURCES);
     setReservations(INITIAL_RESERVATIONS);
     setNotifications(INITIAL_NOTIFICATIONS);
-    showToast('info', '系統資料已還原', '已重設為標準展示範例資料（系統校徽維持固定）。');
+    showToast('info', '系統資料已還原', '已重設為標準展示範例資料（四間專用教室實景相片與校徽維持固定鎖定）。');
   };
 
   // 統計

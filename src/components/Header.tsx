@@ -119,7 +119,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
             今日：{todayStr}
           </span>
           <span className="hidden sm:inline text-blue-300/80">
-            📌 依規定：借用須於借用日 <strong className="text-white underline decoration-amber-400 underline-offset-2">3 日前</strong> 先行登記（最早預約日：{earliestDateStr}），借用後須於 <strong className="text-white underline decoration-amber-400 underline-offset-2">3 日內</strong> 歸還。
+            📌 依規定：借用須於借用日 <strong className="text-white underline decoration-amber-400 underline-offset-2">30 日前</strong> 先行登記（最早預約日：{earliestDateStr}），借用後須於 <strong className="text-white underline decoration-amber-400 underline-offset-2">3 日內</strong> 歸還。
           </span>
         </div>
         <div className="flex items-center gap-2">

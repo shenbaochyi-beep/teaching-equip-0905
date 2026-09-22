@@ -198,7 +198,7 @@ export const PrintSlipModal: React.FC<PrintSlipModalProps> = ({
           {/* 備註與注意事項 */}
           <div className="bg-slate-100 p-3 rounded-lg text-[11px] text-slate-600 space-y-1">
             <div className="font-bold text-slate-800">教學設備與教室借用規範須知：</div>
-            <div>1. 借用設備與教室一律為本校教職員工，借用前須於借用日 3 日前先行登記。</div>
+            <div>1. 借用設備與教室一律為本校教職員工，借用前須於借用日 30 日前先行登記。</div>
             <div>2. 借用後須於 3 日內點收歸還。如有特殊教學或競賽專案需延長，須填具特殊延長借用申請書，經招設組審查及教務主任核定。</div>
             <div>3. 物品領取時請會同招設組同仁當面清點配件；歸還時若有遺失或人為損壞應負修復賠償責任。</div>
           </div>
