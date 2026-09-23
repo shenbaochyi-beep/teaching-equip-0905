@@ -20,7 +20,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ShieldAlert, KeyRound } from 'lucide-react';
 
 const MainAppContent: React.FC = () => {
-  const { isAuthenticated, setIsLoginModalOpen } = useApp();
+  const { isAuthenticated, setIsLoginModalOpen, currentUser, showToast } = useApp();
   const [activeTab, setActiveTab] = useState<string>('explore');
   
   // Modal 狀態
@@ -39,7 +39,11 @@ const MainAppContent: React.FC = () => {
   };
 
   const handleOpenImageModal = (resource: ResourceItem) => {
-    if (LOCKED_CLASSROOM_IDS.includes(resource.id)) return;
+    const hasPhotoPermission = (currentUser.role === 'academic_director' || currentUser.role === 'section_officer') && isAuthenticated;
+    if (!hasPhotoPermission) {
+      showToast('error', '權限受限', '上傳/修訂實景相片權限僅開放【教務主任】與【招設組長】二人！');
+      return;
+    }
     setSelectedResourceForImage(resource);
   };
 

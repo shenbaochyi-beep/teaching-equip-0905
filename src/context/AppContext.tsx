@@ -1020,23 +1020,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('info', '資源狀態已更新', '設備/教室現況已即時變更');
   };
 
-  // 場地/設備相片更換（支援教學設備實景相片上傳；4間專用教室照片已鎖定並移除上傳功能）
+  // 場地/設備相片更換（權限嚴格管制：僅開放教務主任與招設組長二人具備相片維護權限）
   const updateResourceImage = (resourceId: string, newImageUrl: string) => {
-    if (LOCKED_CLASSROOM_IDS.includes(resourceId)) {
-      showToast('error', '照片已鎖定', '視聽教室、合作學習教室、多功能學習教室及生活科技/創客教室照片已鎖定，不開放上傳更換。');
+    const hasPhotoPermission = (currentUser.role === 'academic_director' || currentUser.role === 'section_officer') && isAuthenticated;
+    if (!hasPhotoPermission) {
+      showToast('error', '權限受限', '上傳/修訂實景相片權限僅開放【教務主任】與【招設組長】二人！');
       return;
     }
 
     // 永久保存使用者原上傳之實景照片至專屬金鑰
     safeStorage.setItem(`school_equip_original_uploaded_photo_${resourceId}`, newImageUrl);
     safeStorage.setItem(`custom_room_photo_${resourceId}`, newImageUrl);
+    safeStorage.setItem(`school_equip_locked_photo_${resourceId}`, newImageUrl);
 
     setResources(prev => {
       const updated = prev.map(r => r.id === resourceId ? { ...r, imageUrl: newImageUrl } : r);
       safeStorage.setItem(STORAGE_KEYS.RESOURCES, JSON.stringify(updated));
       return updated;
     });
-    showToast('success', '設備實景相片已成功修訂', '系統總覽卡片、詳細規格與預約單將同步即時呈現！');
+    showToast('success', '實景相片已成功修訂', '系統總覽卡片、詳細規格與預約單將同步即時呈現！');
   };
 
   const markNotificationRead = (notificationId: string) => {

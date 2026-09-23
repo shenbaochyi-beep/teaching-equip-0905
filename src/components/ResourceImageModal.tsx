@@ -25,7 +25,7 @@ export const ResourceImageModal: React.FC<ResourceImageModalProps> = ({
   isOpen,
   onClose
 }) => {
-  const { updateResourceImage, showToast } = useApp();
+  const { updateResourceImage, showToast, currentUser, isAuthenticated } = useApp();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [previewUrl, setPreviewUrl] = useState<string>('');
@@ -41,7 +41,9 @@ export const ResourceImageModal: React.FC<ResourceImageModalProps> = ({
     }
   }, [resource, isOpen]);
 
-  if (!isOpen || !resource || LOCKED_CLASSROOM_IDS.includes(resource.id)) return null;
+  const hasPhotoPermission = (currentUser.role === 'academic_director' || currentUser.role === 'section_officer') && isAuthenticated;
+
+  if (!isOpen || !resource || !hasPhotoPermission) return null;
 
   // 壓縮圖片成合適大小的 DataURL，避免超出 localStorage 容量
   const handleFileSelect = (file: File) => {
@@ -162,6 +164,13 @@ export const ResourceImageModal: React.FC<ResourceImageModalProps> = ({
                 修訂場地實景圖片
                 <span className="text-xs font-mono font-normal bg-sky-950 text-sky-300 border border-sky-800 px-2 py-0.5 rounded">
                   {resource.code}
+                </span>
+                <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${
+                  currentUser.role === 'academic_director'
+                    ? 'bg-purple-900/70 text-purple-200 border border-purple-600/70'
+                    : 'bg-sky-900/70 text-sky-200 border border-sky-600/70'
+                }`}>
+                  {currentUser.role === 'academic_director' ? '教務主任主管權限' : '招設組長管理權限'}
                 </span>
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">{resource.name}</p>

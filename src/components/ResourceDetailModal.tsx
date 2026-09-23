@@ -41,7 +41,8 @@ export const ResourceDetailModal: React.FC<ResourceDetailModalProps> = ({
   onBook,
   onOpenImageModal
 }) => {
-  const { reservations } = useApp();
+  const { reservations, currentUser, isAuthenticated } = useApp();
+  const hasPhotoPermission = (currentUser.role === 'academic_director' || currentUser.role === 'section_officer') && isAuthenticated;
 
   const todayStr = getTodayString();
   const defaultCheckDate = getEarliestReservationDate(todayStr);
@@ -102,14 +103,18 @@ export const ResourceDetailModal: React.FC<ResourceDetailModalProps> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent pointer-events-none" />
           
           <div className="absolute top-4 right-4 flex items-center gap-2">
-            {onOpenImageModal && !LOCKED_CLASSROOM_IDS.includes(resource.id) && (
+            {onOpenImageModal && hasPhotoPermission && (
               <button
                 type="button"
                 onClick={() => onOpenImageModal(resource)}
-                className="bg-slate-900/80 hover:bg-sky-600 text-slate-200 hover:text-white px-3 py-1.5 rounded-full backdrop-blur transition-all border border-slate-700 hover:border-sky-500 text-xs font-semibold flex items-center gap-1.5 shadow"
-                title="上傳或更換實景相片"
+                className={`${
+                  currentUser.role === 'academic_director'
+                    ? 'bg-purple-900/80 hover:bg-purple-700 text-purple-100 border-purple-500/60 hover:border-purple-400'
+                    : 'bg-sky-900/80 hover:bg-sky-700 text-sky-100 border-sky-500/60 hover:border-sky-400'
+                } px-3 py-1.5 rounded-full backdrop-blur transition-all border text-xs font-semibold flex items-center gap-1.5 shadow`}
+                title={currentUser.role === 'academic_director' ? '教務主任主管權限：上傳或更換實景相片' : '招設組長管理權限：上傳或更換實景相片'}
               >
-                <Camera className="w-3.5 h-3.5" />
+                <Camera className={`w-3.5 h-3.5 ${currentUser.role === 'academic_director' ? 'text-purple-300' : 'text-sky-300'}`} />
                 <span>修訂相片</span>
               </button>
             )}

@@ -34,7 +34,8 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
   onBookResource,
   onOpenImageModal
 }) => {
-  const { resources, reservations } = useApp();
+  const { resources, reservations, currentUser, isAuthenticated } = useApp();
+  const hasPhotoPermission = (currentUser.role === 'academic_director' || currentUser.role === 'section_officer') && isAuthenticated;
   
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -243,22 +244,26 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent pointer-events-none" />
 
-                  {/* 財產編號 (4間專用教室已鎖定照片並移除上傳相片功能) */}
+                  {/* 財產編號與修訂/上傳實景相片按鈕 (僅開放教務主任與招設組長二人) */}
                   <div className="absolute top-3 left-3 flex items-center gap-1.5 z-10">
                     <span className="bg-slate-900/90 backdrop-blur-sm text-sky-300 text-[11px] font-mono font-semibold px-2 py-0.5 rounded border border-slate-700 shadow">
                       {resource.code}
                     </span>
-                    {onOpenImageModal && !LOCKED_CLASSROOM_IDS.includes(resource.id) && (
+                    {onOpenImageModal && hasPhotoPermission && (
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           onOpenImageModal(resource);
                         }}
-                        title="上傳或更換實景相片"
-                        className="bg-slate-900/85 hover:bg-sky-600 text-slate-100 hover:text-white px-2 py-0.5 rounded backdrop-blur-sm border border-slate-700 hover:border-sky-400 shadow transition-all flex items-center gap-1 text-[11px] font-medium"
+                        title={currentUser.role === 'academic_director' ? '教務主任主管權限：上傳或更換實景相片' : '招設組長管理權限：上傳或更換實景相片'}
+                        className={`${
+                          currentUser.role === 'academic_director'
+                            ? 'bg-purple-900/85 hover:bg-purple-700 text-purple-100 border-purple-500/50 hover:border-purple-400'
+                            : 'bg-sky-900/85 hover:bg-sky-700 text-sky-100 border-sky-500/50 hover:border-sky-400'
+                        } px-2 py-0.5 rounded backdrop-blur-sm border shadow transition-all flex items-center gap-1 text-[11px] font-medium`}
                       >
-                        <Camera className="w-3 h-3 text-sky-400 group-hover/btn:text-white" />
+                        <Camera className={`w-3 h-3 ${currentUser.role === 'academic_director' ? 'text-purple-300' : 'text-sky-300'} group-hover/btn:text-white`} />
                         <span>上傳相片</span>
                       </button>
                     )}
