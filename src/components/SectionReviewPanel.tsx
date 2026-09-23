@@ -18,7 +18,8 @@ import {
   Send,
   MessageSquare,
   Search,
-  Filter
+  Filter,
+  Lock
 } from 'lucide-react';
 import { daysBetween, getTodayString } from '../utils/dateUtils';
 
@@ -513,7 +514,7 @@ export const SectionReviewPanel: React.FC = () => {
                     referrerPolicy="no-referrer"
                     onError={(e) => {
                       const target = e.currentTarget;
-                      if (item.id in LOCKED_ROOM_IMAGES) {
+                      if (item.isPhotoLocked || item.id in LOCKED_ROOM_IMAGES || target.src.startsWith('data:image/')) {
                         return;
                       }
                       if (!target.src.includes('unsplash')) {
@@ -523,7 +524,18 @@ export const SectionReviewPanel: React.FC = () => {
                     className="w-12 h-12 rounded-lg object-cover border border-slate-200 shrink-0" 
                   />
                   <div>
-                    <div className="font-mono text-sky-700 text-[11px] font-semibold">{item.code}</div>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="font-mono text-sky-700 text-[11px] font-semibold">{item.code}</span>
+                      {item.isPhotoLocked && (
+                        <span 
+                          className="text-[10px] font-medium bg-amber-50 text-amber-800 border border-amber-300 px-1 py-0.2 rounded flex items-center gap-0.5"
+                          title={item.photoLockedBy ? `照片已由 ${item.photoLockedBy} 上傳並鎖定` : '照片已鎖定'}
+                        >
+                          <Lock className="w-2.5 h-2.5 text-amber-600" />
+                          已鎖定
+                        </span>
+                      )}
+                    </div>
                     <div className="font-bold text-slate-900 text-sm">{item.name}</div>
                     <div className="text-slate-500 text-[11px]">{item.location}</div>
                   </div>

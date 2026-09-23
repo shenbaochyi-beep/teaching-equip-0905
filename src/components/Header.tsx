@@ -231,7 +231,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
                   className="flex items-center gap-2 bg-rose-900/90 hover:bg-rose-800 text-rose-100 border border-rose-500/50 px-3 py-1.5 rounded-xl transition-all shadow-md animate-pulse"
                 >
                   <Lock className="w-4 h-4 text-rose-300" />
-                  <span className="text-xs font-bold">資安鎖定：請登入驗證</span>
+                  <span className="text-xs font-bold">資安鎖定：請輸入帳號登入</span>
                   <LogIn className="w-3.5 h-3.5" />
                 </button>
               ) : (
@@ -337,7 +337,13 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
         <nav className="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-2 scrollbar-none text-xs sm:text-sm font-medium border-t border-slate-800/80 pt-2">
           <button
             id="nav-explore"
-            onClick={() => setActiveTab('explore')}
+            onClick={() => {
+              if (!isAuthenticated) {
+                setIsLoginModalOpen(true);
+                return;
+              }
+              setActiveTab('explore');
+            }}
             className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all shrink-0 ${
               activeTab === 'explore'
                 ? 'bg-sky-600 text-white font-semibold shadow'
@@ -350,7 +356,13 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
 
           <button
             id="nav-schedule"
-            onClick={() => setActiveTab('schedule')}
+            onClick={() => {
+              if (!isAuthenticated) {
+                setIsLoginModalOpen(true);
+                return;
+              }
+              setActiveTab('schedule');
+            }}
             className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all shrink-0 ${
               activeTab === 'schedule'
                 ? 'bg-sky-600 text-white font-semibold shadow'
@@ -363,7 +375,13 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
 
           <button
             id="nav-my-reservations"
-            onClick={() => setActiveTab('my_reservations')}
+            onClick={() => {
+              if (!isAuthenticated) {
+                setIsLoginModalOpen(true);
+                return;
+              }
+              setActiveTab('my_reservations');
+            }}
             className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all shrink-0 ${
               activeTab === 'my_reservations'
                 ? 'bg-sky-600 text-white font-semibold shadow'
@@ -377,7 +395,13 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
           {/* 教務處招設組專屬頁籤 */}
           <button
             id="nav-section-review"
-            onClick={() => setActiveTab('section_review')}
+            onClick={() => {
+              if (!isAuthenticated) {
+                setIsLoginModalOpen(true);
+                return;
+              }
+              setActiveTab('section_review');
+            }}
             className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all shrink-0 ${
               activeTab === 'section_review'
                 ? 'bg-sky-600 text-white font-semibold shadow'
@@ -396,7 +420,13 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
           {/* 教務主任核定專屬頁籤 */}
           <button
             id="nav-director-approval"
-            onClick={() => setActiveTab('director_approval')}
+            onClick={() => {
+              if (!isAuthenticated) {
+                setIsLoginModalOpen(true);
+                return;
+              }
+              setActiveTab('director_approval');
+            }}
             className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all shrink-0 ${
               activeTab === 'director_approval'
                 ? 'bg-purple-600 text-white font-semibold shadow'

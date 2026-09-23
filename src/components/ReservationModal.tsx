@@ -21,7 +21,8 @@ import {
   BookOpen, 
   MapPin, 
   AlertTriangle,
-  Info
+  Info,
+  Lock
 } from 'lucide-react';
 
 interface ReservationModalProps {
@@ -177,7 +178,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               referrerPolicy="no-referrer"
               onError={(e) => {
                 const target = e.currentTarget;
-                if (resource.id in LOCKED_ROOM_IMAGES) {
+                if (resource.isPhotoLocked || resource.id in LOCKED_ROOM_IMAGES || target.src.startsWith('data:image/')) {
                   return;
                 }
                 if (!target.src.includes('unsplash')) {
@@ -187,10 +188,19 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               className="w-16 h-16 rounded-lg object-cover border border-slate-200 shrink-0" 
             />
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs font-mono bg-sky-50 text-sky-700 px-2 py-0.5 rounded border border-sky-200 font-semibold">
                   {resource.code}
                 </span>
+                {resource.isPhotoLocked && (
+                  <span 
+                    className="text-[10px] font-medium bg-amber-50 text-amber-800 border border-amber-300 px-1.5 py-0.5 rounded flex items-center gap-1"
+                    title={resource.photoLockedBy ? `官方實景照片已由 ${resource.photoLockedBy} 上傳並核定鎖定` : '官方實景照片已核定鎖定'}
+                  >
+                    <Lock className="w-2.5 h-2.5 text-amber-600" />
+                    照片已鎖定
+                  </span>
+                )}
                 <span className="text-xs text-slate-500">{resource.location}</span>
               </div>
               <h4 className="font-bold text-sm sm:text-base text-slate-900 mt-1 truncate">

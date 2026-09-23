@@ -41,7 +41,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, targetU
     setMatchedUsers(null);
 
     if (!accountInput.trim()) {
-      setErrorMessage('請輸入教職員登入帳號！');
+      setErrorMessage('登入系統必須先輸入帳號才能登入！');
       return;
     }
 
@@ -105,8 +105,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, targetU
             </div>
           </div>
 
-          <p className="text-xs text-blue-200/80 mt-2.5 leading-relaxed">
-            為維護學校教學設備與專科教室之借用資安權責，本系統全體教職員皆配發專屬公務帳號，<strong className="text-white underline decoration-amber-400 underline-offset-2">需帳號完全符合才能登入授權</strong>。
+          <p className="text-xs text-blue-200/90 mt-2.5 leading-relaxed">
+            為維護校產管理資安規範，<strong className="text-amber-300 font-semibold underline underline-offset-2">登入系統必須先輸入帳號才能登入</strong>。請輸入您的個人專屬公務帳號完成身分核身。
           </p>
 
           {isAuthenticated && currentUser && (
@@ -131,7 +131,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, targetU
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                請輸入教職員登入帳號 <span className="text-rose-600">*</span>
+                請輸入教職員公務帳號 <span className="text-rose-600">*</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
@@ -145,7 +145,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, targetU
                     setErrorMessage('');
                     setMatchedUsers(null);
                   }}
-                  placeholder="請輸入教職員登入帳號"
+                  placeholder="請輸入教職員公務帳號"
                   className={`w-full pl-9 pr-4 py-2.5 text-sm bg-slate-50 border rounded-xl font-mono text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white transition-all ${
                     errorMessage ? 'border-rose-400 ring-2 ring-rose-200' : 'border-slate-300 focus:border-sky-500 focus:ring-2 focus:ring-sky-100'
                   }`}
@@ -154,7 +154,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, targetU
               </div>
               <p className="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1">
                 <Lock className="w-3 h-3 text-slate-400" />
-                英文字母不分大小寫，需帳號完全符合名冊設定方可登入。
+                登入系統必須先輸入帳號才能登入，需帳號完全符合方可解鎖系統。
               </p>
             </div>
 

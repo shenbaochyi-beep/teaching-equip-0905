@@ -78,11 +78,11 @@ const MainAppContent: React.FC = () => {
                 校園資通安全管制
               </span>
               <h2 className="text-xl font-bold text-slate-900 mt-2">
-                請先輸入教職員帳號完成身分驗證
+                登入系統必須先輸入帳號才能登入
               </h2>
             </div>
             <p className="text-sm text-slate-600 leading-relaxed max-w-md mx-auto">
-              本教學設備與教室借用系統涉及校產保管與行政簽核權限，依教育部及校內資通安全規範，全體教職員必須輸入個人專屬公務帳號，需帳號完全符合名冊設定方能解鎖系統進行預約與管理操作。
+              本教學設備與教室借用系統涉及校產保管與行政簽核權責，依教育部及校內資通安全規範，全體人員必須先輸入個人專屬教職員公務帳號，經系統核對完全相符後方能登入系統使用各項功能。
             </p>
             <div className="pt-2">
               <button
@@ -90,7 +90,7 @@ const MainAppContent: React.FC = () => {
                 className="px-6 py-3 bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm rounded-xl shadow-md shadow-sky-600/20 transition-all inline-flex items-center gap-2"
               >
                 <KeyRound className="w-4 h-4" />
-                開啟身分驗證登入視窗
+                輸入帳號進行身分驗證登入
               </button>
             </div>
           </div>

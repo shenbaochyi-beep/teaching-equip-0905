@@ -19,7 +19,8 @@ import {
   Wrench,
   Info,
   Camera,
-  Upload
+  Upload,
+  Lock
 } from 'lucide-react';
 import { getTodayString, getEarliestReservationDate } from '../utils/dateUtils';
 
@@ -233,7 +234,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                     referrerPolicy="no-referrer"
                     onError={(e) => {
                       const target = e.currentTarget;
-                      if (resource.id in LOCKED_ROOM_IMAGES) {
+                      if (resource.isPhotoLocked || resource.id in LOCKED_ROOM_IMAGES || target.src.startsWith('data:image/')) {
                         return;
                       }
                       if (!target.src.includes('unsplash')) {
@@ -244,8 +245,8 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent pointer-events-none" />
 
-                  {/* 財產編號與修訂/上傳實景相片按鈕 (僅開放教務主任與招設組長二人) */}
-                  <div className="absolute top-3 left-3 flex items-center gap-1.5 z-10">
+                  {/* 財產編號與修訂/上傳實景相片按鈕 (僅開放教務主任與招設組長二人) / 照片已鎖定標記 */}
+                  <div className="absolute top-3 left-3 flex items-center gap-1.5 z-10 flex-wrap">
                     <span className="bg-slate-900/90 backdrop-blur-sm text-sky-300 text-[11px] font-mono font-semibold px-2 py-0.5 rounded border border-slate-700 shadow">
                       {resource.code}
                     </span>
@@ -266,6 +267,17 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                         <Camera className={`w-3 h-3 ${currentUser.role === 'academic_director' ? 'text-purple-300' : 'text-sky-300'} group-hover/btn:text-white`} />
                         <span>上傳相片</span>
                       </button>
+                    )}
+
+                    {/* 照片已核定鎖定標記：向所有登入人員明確呈現照片已鎖定保護 */}
+                    {resource.isPhotoLocked && (
+                      <span
+                        title={resource.photoLockedBy ? `實景照片已由 ${resource.photoLockedBy} 上傳並核定鎖定` : '實景照片已核定鎖定'}
+                        className="bg-amber-950/85 text-amber-300 border border-amber-500/50 text-[10px] font-medium px-1.5 py-0.5 rounded backdrop-blur-sm shadow flex items-center gap-1"
+                      >
+                        <Lock className="w-2.5 h-2.5 text-amber-400" />
+                        <span>已鎖定</span>
+                      </span>
                     )}
                   </div>
 

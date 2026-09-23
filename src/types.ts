@@ -38,6 +38,9 @@ export interface ResourceItem {
   custodian: string; // 管理單位 (e.g. 教務處招設組 / 特教組)
   description: string;
   cautionNotes: string;
+  isPhotoLocked?: boolean; // 實景照片是否已鎖定（由招設組或教務主任上傳後正式鎖定）
+  photoLockedBy?: string;  // 鎖定/上傳核定人（例：林彥伊 招設組長、黃寀霓 主任）
+  photoLockedAt?: string;  // 鎖定時間戳記
 }
 
 export type ReservationStatus = 

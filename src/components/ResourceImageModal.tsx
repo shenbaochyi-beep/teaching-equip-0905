@@ -10,7 +10,9 @@ import {
   AlertCircle,
   Sparkles,
   Link,
-  Camera
+  Camera,
+  Lock,
+  ShieldCheck
 } from 'lucide-react';
 import { LOCKED_ROOM_IMAGES, LOCKED_CLASSROOM_IDS, INITIAL_RESOURCES } from '../data/mockData';
 
@@ -160,8 +162,8 @@ export const ResourceImageModal: React.FC<ResourceImageModalProps> = ({
               <Camera className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-base text-slate-100 flex items-center gap-2">
-                修訂場地實景圖片
+              <h3 className="font-bold text-base text-slate-100 flex items-center gap-2 flex-wrap">
+                修訂與鎖定實景相片
                 <span className="text-xs font-mono font-normal bg-sky-950 text-sky-300 border border-sky-800 px-2 py-0.5 rounded">
                   {resource.code}
                 </span>
@@ -172,6 +174,12 @@ export const ResourceImageModal: React.FC<ResourceImageModalProps> = ({
                 }`}>
                   {currentUser.role === 'academic_director' ? '教務主任主管權限' : '招設組長管理權限'}
                 </span>
+                {resource.isPhotoLocked && (
+                  <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-900/70 text-amber-200 border border-amber-600/70 flex items-center gap-1">
+                    <Lock className="w-3 h-3 text-amber-300" />
+                    官方照片已鎖定
+                  </span>
+                )}
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">{resource.name}</p>
             </div>
@@ -310,10 +318,10 @@ export const ResourceImageModal: React.FC<ResourceImageModalProps> = ({
           )}
 
           {/* 說明提示 */}
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-start gap-2.5 text-xs text-slate-600">
-            <Sparkles className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2.5 text-xs text-amber-900">
+            <Lock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
             <div className="leading-relaxed">
-              更換後將立即同步套用至首頁探索卡片、教室詳細規格彈窗、借用單排程與預約登記表單。若日後需要亦可隨時更換或還原。
+              <strong>相片鎖定資安機制：</strong>當教務主任或招設組長上傳相片後，系統將<strong>自動將該相片正式鎖定</strong>，全校其他人員登入後皆統一以此最新上傳後的相片顯示。
             </div>
           </div>
         </div>
@@ -343,8 +351,8 @@ export const ResourceImageModal: React.FC<ResourceImageModalProps> = ({
               disabled={isProcessing}
               className="px-5 py-2 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white text-xs font-bold rounded-xl shadow transition-all flex items-center gap-1.5 disabled:opacity-50"
             >
-              <Check className="w-4 h-4" />
-              確認儲存修訂
+              <Lock className="w-4 h-4" />
+              確認儲存並鎖定相片
             </button>
           </div>
         </div>

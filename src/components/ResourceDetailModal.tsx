@@ -92,7 +92,7 @@ export const ResourceDetailModal: React.FC<ResourceDetailModalProps> = ({
             referrerPolicy="no-referrer"
             onError={(e) => {
               const target = e.currentTarget;
-              if (resource.id in LOCKED_ROOM_IMAGES) {
+              if (resource.isPhotoLocked || resource.id in LOCKED_ROOM_IMAGES || target.src.startsWith('data:image/')) {
                 return;
               }
               if (!target.src.includes('unsplash')) {
@@ -103,6 +103,18 @@ export const ResourceDetailModal: React.FC<ResourceDetailModalProps> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent pointer-events-none" />
           
           <div className="absolute top-4 right-4 flex items-center gap-2">
+            {resource.isPhotoLocked && (
+              <span 
+                className="bg-amber-950/85 text-amber-300 border border-amber-500/50 px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 backdrop-blur shadow"
+                title={resource.photoLockedBy ? `實景照片已由 ${resource.photoLockedBy} 上傳並核定鎖定` : '實景照片已核定鎖定'}
+              >
+                <Lock className="w-3.5 h-3.5 text-amber-400" />
+                <span>照片已鎖定</span>
+                {resource.photoLockedBy && (
+                  <span className="hidden sm:inline text-amber-200/80 text-[11px]">（{resource.photoLockedBy}）</span>
+                )}
+              </span>
+            )}
             {onOpenImageModal && hasPhotoPermission && (
               <button
                 type="button"

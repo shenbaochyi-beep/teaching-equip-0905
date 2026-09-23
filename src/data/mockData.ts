@@ -476,7 +476,10 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     ],
     imageUrl: LOCKED_ROOM_IMAGES['res-av-room'],
     description: '適用於全校性公開授課、專題講座、教學觀摩、視聽教學與大型影音成果發表會。',
-    cautionNotes: '使用完畢請落實關閉音響環控主機與投影機散熱電源，嚴禁在室內攜帶含糖飲料與熱食。'
+    cautionNotes: '使用完畢請落實關閉音響環控主機與投影機散熱電源，嚴禁在室內攜帶含糖飲料與熱食。',
+    isPhotoLocked: true,
+    photoLockedBy: '教務處招設組 / 教務主任',
+    photoLockedAt: '校內官方核定'
   },
   {
     id: 'res-coop-room',
@@ -498,7 +501,10 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     ],
     imageUrl: LOCKED_ROOM_IMAGES['res-coop-room'],
     description: '專供分組合作學習、PBL問題導向專題研討、學生同儕互評、公開觀議課及跨學科協同教學使用。',
-    cautionNotes: '分組桌椅使用完畢請歸位整齊，關閉大螢幕、投影機、冷氣及電燈電源，場地清潔復原。'
+    cautionNotes: '分組桌椅使用完畢請歸位整齊，關閉大螢幕、投影機、冷氣及電燈電源，場地清潔復原。',
+    isPhotoLocked: true,
+    photoLockedBy: '教務處招設組 / 教務主任',
+    photoLockedAt: '校內官方核定'
   },
   {
     id: 'res-multi-room',
@@ -520,7 +526,10 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     ],
     imageUrl: LOCKED_ROOM_IMAGES['res-multi-room'],
     description: '專為跨領域素養導向教學、分組研討、研習會議及多元教學活動設計之寬敞多功能教室。',
-    cautionNotes: '使用完畢請將桌椅復原整齊，關閉冷氣、電燈、循環扇與電器設備並將黑板清理乾淨。'
+    cautionNotes: '使用完畢請將桌椅復原整齊，關閉冷氣、電燈、循環扇與電器設備並將黑板清理乾淨。',
+    isPhotoLocked: true,
+    photoLockedBy: '教務處招設組 / 教務主任',
+    photoLockedAt: '校內官方核定'
   },
   {
     id: 'res-living-tech-room',
@@ -542,7 +551,10 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     ],
     imageUrl: LOCKED_ROOM_IMAGES['res-living-tech-room'],
     description: '提供高中生活科技課程、創客自造專題、科技素養實作、機構結構設計與跨領域 STEAM 創思模型製作。',
-    cautionNotes: '操作機具請遵守安全守則；使用完畢請落實關閉觸控大螢幕、電燈、吊扇電源，維護機具與場地清潔復原。'
+    cautionNotes: '操作機具請遵守安全守則；使用完畢請落實關閉觸控大螢幕、電燈、吊扇電源，維護機具與場地清潔復原。',
+    isPhotoLocked: true,
+    photoLockedBy: '教務處招設組 / 教務主任',
+    photoLockedAt: '校內官方核定'
   },
   {
     id: 'res-laptop-batch',
