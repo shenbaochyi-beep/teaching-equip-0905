@@ -152,28 +152,51 @@ const STORAGE_KEYS = {
   CUSTOM_LOGO: 'school_equip_custom_logo_v14'
 };
 
+const memoryStore: Record<string, string> = {};
+
 // 安全 Storage 存取封裝，防範 iframe 隱私限制或配額超過引發之 Uncaught 錯誤
 const safeStorage = {
   getItem: (key: string): string | null => {
     try {
-      if (typeof window === 'undefined' || !window.localStorage) return null;
-      return window.localStorage.getItem(key);
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const val = window.localStorage.getItem(key);
+        if (val !== null) return val;
+      }
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        const sVal = window.sessionStorage.getItem(key);
+        if (sVal !== null) return sVal;
+      }
+      return memoryStore[key] || null;
     } catch {
-      return null;
+      return memoryStore[key] || null;
     }
   },
   setItem: (key: string, value: string): void => {
+    memoryStore[key] = value;
     try {
-      if (typeof window === 'undefined' || !window.localStorage) return;
-      window.localStorage.setItem(key, value);
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, value);
+      }
     } catch (e) {
-      console.warn(`[SafeStorage] Could not set ${key}:`, e);
+      console.warn(`[SafeStorage] Could not set localStorage ${key}:`, e);
+      try {
+        if (typeof window !== 'undefined' && window.sessionStorage) {
+          window.sessionStorage.setItem(key, value);
+        }
+      } catch {
+        // memoryStore holds it
+      }
     }
   },
   removeItem: (key: string): void => {
+    delete memoryStore[key];
     try {
-      if (typeof window === 'undefined' || !window.localStorage) return;
-      window.localStorage.removeItem(key);
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.removeItem(key);
+      }
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        window.sessionStorage.removeItem(key);
+      }
     } catch {
       // ignore
     }
@@ -190,10 +213,23 @@ function safeJsonParse<T>(jsonString: string | null, fallback: T): T {
   }
 }
 
+// 國立成功商業水產職業學校 (成功商水 CKVS) 官方網站標準校徽 (學校官方正版標誌)
+export const DEFAULT_SCHOOL_LOGO = '/official_ckvs_logo.jpg';
+
+// 舊版校徽特徵識別 (僅用於識別舊版預設，絕不可誤判使用者上傳之圖檔)
+const LEGACY_SHALU_MARKER = 'PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCI';
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // 載入持久化或預設資料 (具備容錯與防崩潰機制，平滑繼承已設定之校徽)
+  // 載入持久化或預設資料 (完整支援使用者自訂上傳之校徽，嚴格保留使用者上傳圖檔)
   const [customLogo, setCustomLogo] = useState<string | null>(() => {
-    return safeStorage.getItem(STORAGE_KEYS.CUSTOM_LOGO) || safeStorage.getItem('school_equip_custom_logo_v13') || safeStorage.getItem('school_equip_custom_logo_v12');
+    const saved = safeStorage.getItem(STORAGE_KEYS.CUSTOM_LOGO) || 
+           safeStorage.getItem('school_equip_custom_logo_v13') || 
+           safeStorage.getItem('school_equip_custom_logo_v12');
+    // 若無儲存、為過渡向量版或舊版預設值，預設採用國立成功商水官方正版校徽；若為使用者自訂上傳之圖檔 (Base64) 則 100% 完整保留
+    if (!saved || saved === '/ckvs_logo.svg' || saved.startsWith(LEGACY_SHALU_MARKER) || saved.includes('臺中市立沙鹿') || saved.includes('沙鹿高工經典工藝校徽')) {
+      return DEFAULT_SCHOOL_LOGO;
+    }
+    return saved;
   });
   const [isLogoModalOpen, setIsLogoModalOpen] = useState<boolean>(false);
 

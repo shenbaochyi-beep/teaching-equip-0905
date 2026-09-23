@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+  <defs>
+    <linearGradient id="oceanBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0369a1"/>
+      <stop offset="50%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#075985"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="dolphinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="70%" stop-color="#e0f2fe"/>
+      <stop offset="100%" stop-color="#bae6fd"/>
+    </linearGradient>
+    <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#7dd3fc"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- 外層同心圓環 (太平洋深藍底色) -->
+  <circle cx="80" cy="80" r="76" fill="url(#oceanBg)" stroke="#38bdf8" stroke-width="3.5"/>
+  <circle cx="80" cy="80" r="70" fill="none" stroke="#fde047" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+  <!-- 學校外環文字 (繁體正楷) -->
+  <path id="textArcTop" d="M 26 80 A 54 54 0 0 1 134 80" fill="none"/>
+  <path id="textArcBottom" d="M 134 80 A 54 54 0 0 1 26 80" fill="none"/>
+  
+  <text font-family="'Noto Sans TC', 'Microsoft JhengHei', sans-serif" font-size="10.5" font-weight="900" fill="#ffffff" letter-spacing="1.8">
+    <textPath href="#textArcTop" startOffset="50%" text-anchor="middle">國立成功商業水產職業學校</textPath>
+  </text>
+  
+  <text font-family="'Arial', sans-serif" font-size="7.5" font-weight="bold" fill="#fde047" letter-spacing="1.2">
+    <textPath href="#textArcBottom" startOffset="50%" text-anchor="middle">• CKVS · TAITUNG •</textPath>
+  </text>
+
+  <!-- 內圈白色徽章底盤 -->
+  <circle cx="80" cy="80" r="44" fill="#ffffff" stroke="#0284c7" stroke-width="2.5" filter="url(#dropShadow)"/>
+  <circle cx="80" cy="80" r="41" fill="#f0f9ff"/>
+
+  <!-- 象徵商業「古幣」外圓內方紋飾（底層浮雕） -->
+  <circle cx="80" cy="80" r="28" fill="none" stroke="#e0f2fe" stroke-width="3" stroke-dasharray="6,4"/>
+  <rect x="72" y="72" width="16" height="16" rx="2" fill="none" stroke="#bae6fd" stroke-width="1.5"/>
+
+  <!-- 躍起海豚（象徵成功商水大躍進）主圖案 -->
+  <g transform="translate(80, 75)">
+    <!-- 海浪花紋 (水產·浩瀚太平洋) -->
+    <path d="M -34 16 C -24 8, -16 22, -6 14 C 4 6, 14 20, 24 12 C 29 8, 33 12, 35 15 C 33 24, 18 28, 0 28 C -18 28, -30 22, -34 16 Z" fill="url(#waveGrad)"/>
+    <path d="M -32 20 C -22 14, -14 24, -4 18 C 6 12, 16 23, 28 17 C 18 26, -10 27, -32 20 Z" fill="#0284c7" opacity="0.6"/>
+    <path d="M -20 18 Q -10 10 0 16 Q 10 22 20 14" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- 海豚身軀與鰭 -->
+    <!-- 尾鰭 -->
+    <path d="M -22 6 C -28 3, -32 -2, -31 -5 C -29 -4, -25 -1, -21 2 Z" fill="url(#dolphinGrad)" stroke="#0284c7" stroke-width="1"/>
+    <path d="M -23 7 C -27 9, -32 12, -33 9 C -30 7, -26 6, -22 5 Z" fill="url(#dolphinGrad)" stroke="#0284c7" stroke-width="1"/>
+    
+    <!-- 主軀幹弧線 -->
+    <path d="M -24 5 C -18 -4, -6 -18, 6 -19 C 18 -20, 26 -11, 28 -3 C 29 1, 26 5, 22 6 C 18 6, 17 2, 13 0 C 4 -4, -10 4, -24 5 Z" fill="url(#dolphinGrad)" stroke="#0369a1" stroke-width="1.5"/>
+    
+    <!-- 背鰭 -->
+    <path d="M 4 -19 C 7 -27, 13 -26, 12 -19 Z" fill="#bae6fd" stroke="#0369a1" stroke-width="1"/>
+    
+    <!-- 胸鰭 -->
+    <path d="M 14 0 C 18 6, 21 8, 22 4 C 20 2, 17 0, 14 0 Z" fill="#bae6fd" stroke="#0369a1" stroke-width="0.8"/>
+    
+    <!-- 腹部陰影與流線 -->
+    <path d="M -20 4 C -10 1, 0 -7, 10 -4 C 18 -1, 23 3, 21 5 C 15 2, 5 0, -18 4 Z" fill="#ffffff" opacity="0.9"/>
+    
+    <!-- 眼睛 -->
+    <circle cx="22" cy="-5" r="1.4" fill="#0c4a6e"/>
+    <circle cx="22.4" cy="-5.4" r="0.5" fill="#ffffff"/>
+    
+    <!-- 躍水水珠 -->
+    <circle cx="28" cy="-14" r="1.5" fill="#38bdf8"/>
+    <circle cx="-12" cy="-14" r="1.2" fill="#7dd3fc"/>
+    <circle cx="-4" cy="-23" r="1" fill="#38bdf8"/>
+  </g>
+
+  <!-- 中央核心標字「成功商水」金盾印章 -->
+  <g transform="translate(80, 102)">
+    <rect x="-25" y="-8" width="50" height="16" rx="8" fill="url(#goldGrad)" stroke="#b45309" stroke-width="1" filter="url(#dropShadow)"/>
+    <text y="3.8" font-family="'Noto Sans TC', 'Microsoft JhengHei', sans-serif" font-size="9" font-weight="900" fill="#78350f" text-anchor="middle" letter-spacing="1.5">成功商水</text>
+  </g>
+</svg>

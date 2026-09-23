@@ -20,13 +20,11 @@ import {
   LogOut,
   Lock,
   LogIn,
-  School,
-  Camera
+  School
 } from 'lucide-react';
 import { getTodayString, getEarliestReservationDate } from '../utils/dateUtils';
 import { UserRole, UserProfile } from '../types';
 import { LoginModal } from './LoginModal';
-import { LogoModal } from './LogoModal';
 
 interface HeaderProps {
   activeTab: string;
@@ -48,7 +46,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
     setIsLoginModalOpen,
     logout,
     customLogo,
-    setIsLogoModalOpen
+    showToast
   } = useApp();
 
   const [showRoleMenu, setShowRoleMenu] = useState(false);
@@ -139,21 +137,15 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
           {/* Logo & 標題 */}
           <div className="flex items-center gap-3">
             <div 
-              onClick={() => {
-                if (isAcademicDirector) {
-                  setIsLogoModalOpen(true);
-                } else {
-                  setActiveTab('explore');
-                }
-              }}
-              className={`relative ${isAcademicDirector ? 'group cursor-pointer' : 'cursor-pointer'}`}
-              title={isAcademicDirector ? "教務主任權限：點擊管理/更換系統校徽 LOGO" : "教務處教學設備與教室借用系統 (校徽已固定鎖定)"}
+              onClick={() => setActiveTab('explore')}
+              className="cursor-pointer transition-transform hover:scale-105"
+              title="國立成功商業水產職業學校"
             >
               {customLogo ? (
-                <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white p-1 shadow-md shadow-sky-500/20 border border-sky-400/40 flex items-center justify-center overflow-hidden transition-all ${isAcademicDirector ? 'group-hover:scale-105 group-hover:border-amber-300' : 'hover:opacity-90'}`}>
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white p-1 shadow-md shadow-sky-500/20 border border-sky-400/40 flex items-center justify-center overflow-hidden">
                   <img 
                     src={customLogo} 
-                    alt="校徽 LOGO" 
+                    alt="國立成功商水 校徽 LOGO" 
                     referrerPolicy="no-referrer"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
@@ -162,18 +154,8 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
                   />
                 </div>
               ) : (
-                <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-700 flex items-center justify-center shadow-md shadow-sky-500/20 border border-sky-400/30 transition-all ${isAcademicDirector ? 'group-hover:scale-105 group-hover:border-amber-300' : 'hover:opacity-90'}`}>
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-700 flex items-center justify-center shadow-md shadow-sky-500/20 border border-sky-400/30">
                   <School className="w-6 h-6 text-white" />
-                </div>
-              )}
-              
-              {/* 更換圖示小浮標 (僅教務主任登入後可見並操作) */}
-              {isAcademicDirector && (
-                <div 
-                  className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-amber-600 group-hover:bg-amber-500 text-white rounded-full flex items-center justify-center shadow border border-slate-900 transition-transform group-hover:scale-110"
-                  title="教務主任權限：點擊更換校徽"
-                >
-                  <Camera className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                 </div>
               )}
             </div>
@@ -184,23 +166,11 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
                   onClick={() => setActiveTab('explore')}
                   className="font-bold text-base sm:text-lg tracking-tight text-white hover:text-sky-300 transition-colors cursor-pointer"
                 >
-                  教務處教學設備與教室借用系統
+                  國立成功商水 教學設備與教室借用系統
                 </span>
-                <span className="hidden md:inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-sky-500/20 text-sky-300 rounded border border-sky-400/30">
+                <span className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-sky-500/20 text-sky-300 rounded border border-sky-400/30">
                   教職員專區
                 </span>
-                {/* 僅教務主任登入狀態下顯示更換按鈕 */}
-                {isAcademicDirector && (
-                  <button
-                    type="button"
-                    onClick={() => setIsLogoModalOpen(true)}
-                    className="hidden lg:inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-300 hover:text-white bg-amber-950/60 hover:bg-amber-900/80 px-2.5 py-0.5 rounded-lg border border-amber-500/40 transition-all cursor-pointer shadow-sm shadow-amber-950/30"
-                    title="教務主任專屬權限：更換標題前之校徽 LOGO"
-                  >
-                    <Camera className="w-3 h-3 text-amber-400" />
-                    更換校徽 (主任專屬)
-                  </button>
-                )}
               </div>
               <p className="text-xs text-slate-400 hidden sm:block">
                 含視聽教室、多功能學習教室、合作學習教室、生活科技/創課教室及各項資訊影音設備借用管理
@@ -585,9 +555,6 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
         }}
         targetUserHint={targetUserForLogin}
       />
-
-      {/* 校徽 LOGO 更換視窗 */}
-      <LogoModal />
     </header>
   );
 };

@@ -84,7 +84,7 @@ export const PrintSlipModal: React.FC<PrintSlipModalProps> = ({
                 </div>
               )}
               <div className="text-xs text-slate-700 tracking-wider font-bold uppercase">
-                臺中市立沙鹿工業高級中等學校 · 教務處教學設備組 (招設組)
+                國立成功商業水產職業學校 · 教務處教學設備組 (招設組)
               </div>
             </div>
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1 tracking-tight">

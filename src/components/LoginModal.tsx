@@ -226,44 +226,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, targetU
               )}
             </div>
           </form>
-
-          {/* 資安注意事項與常用身分帳號提示 */}
-          <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 space-y-2.5">
-            <div className="font-bold text-slate-800 flex items-center justify-between">
-              <span className="flex items-center gap-1.5">
-                <Lock className="w-3.5 h-3.5 text-sky-600" />
-                校園公務帳號登入說明
-              </span>
-              <span className="text-[10px] text-slate-400 font-normal">全校共 38 位教職員名冊</span>
-            </div>
-            <p className="text-[11px] text-slate-500 leading-relaxed">
-              依校園資安控管規範，進入系統須先輸入教職員個人公務帳號驗證。若為展示測試或忘記帳號，可點選下方快捷填入：
-            </p>
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {[
-                { label: '教務主任 (黃寀霓)', account: 'slvs200' },
-                { label: '招設組長 (林彥伊)', account: 'slvs230' },
-                { label: '教學組長 (劉泄嬉)', account: 'slvs210' },
-                { label: '生活科技 (李玉雯等)', account: 'slvs281' },
-                { label: '資處科 (劉千玉)', account: 'slvs530' },
-                { label: '普三甲導師 (邱小美)', account: 'slvs301' }
-              ].map((item) => (
-                <button
-                  type="button"
-                  key={item.account}
-                  onClick={() => {
-                    setAccountInput(item.account);
-                    setErrorMessage('');
-                    setMatchedUsers(null);
-                  }}
-                  className="px-2 py-1 bg-white hover:bg-sky-50 border border-slate-200 hover:border-sky-300 rounded-md text-[11px] text-slate-700 transition-colors flex items-center gap-1"
-                >
-                  <span className="font-mono font-bold text-sky-700">{item.account}</span>
-                  <span className="text-slate-500">({item.label})</span>
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* 頁尾說明 */}

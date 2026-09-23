@@ -1,45 +1,48 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp, DEFAULT_SCHOOL_LOGO } from '../context/AppContext';
 import { 
   X, 
   Upload, 
-  Link, 
   RotateCcw, 
   Check, 
   School, 
   GraduationCap, 
-  Cog, 
-  Image as ImageIcon,
   Sparkles,
   Info,
-  Lock,
-  ShieldAlert,
-  ShieldCheck,
-  KeyRound
+  CheckCircle2,
+  FileImage,
+  ArrowRight
 } from 'lucide-react';
 
-// 精選校徽預設 Data URIs (使用已驗證 Base64 編碼，無字元編碼異常風險)
+// 精選校徽預設 Data URIs
 const PRESET_LOGOS = [
   {
-    id: 'slvs-emblem',
-    name: '沙鹿高工 經典工藝校徽',
-    desc: '以工業齒輪、紡紗筒管與工藝意象為主之標準校徽',
-    icon: <Cog className="w-8 h-8 text-sky-400 animate-spin" />,
-    svg: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMDI4NGM3Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMWUzYThhIi8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9ImdvbGQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmYmJmMjQiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNkOTc3MDYiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSI1NiIgZmlsbD0idXJsKCNnKSIgc3Ryb2tlPSIjMzhiZGY4IiBzdHJva2Utd2lkdGg9IjMiLz48cGF0aCBkPSJNNjAgMTQgTDY0IDIyIEw3MiAyMiBMNzAgMzAgTDc4IDMzIEw3MyA0MCBMODAgNDYgTDczIDUwIEw3OCA1NyBMNzAgNTkgTDcyIDY3IEw2NCA2NyBMNjAgNzUgTDU2IDY3IEw0OCA2NyBMNTAgNTkgTDQyIDU3IEw0NyA1MCBMNDAgNDYgTDQ3IDQwIEw0MiAzMyBMNTAgMzAgTDQ4IDIyIEw1NiAyMiBaIiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjZ29sZCkiIHN0cm9rZS13aWR0aD0iMi41Ii8+PGNpcmNsZSBjeD0iNjAiIGN5PSI2MCIgcj0iMzIiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzAzNjlhMSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iNjAiIHk9IjU1IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzBjNGE2ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+5rKZ5belPC90ZXh0Pjx0ZXh0IHg9IjYwIiB5PSI3MCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iOC41IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzAyODRjNyIgdGV4dC1hbmNob3I9Im1pZGRsZSI+U0xWUzwvdGV4dD48Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSI1MSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjEuMiIgc3Ryb2tlLWRhc2hhcnJheT0iMywzIi8+PC9zdmc+'
+    id: 'ckvs-official-web',
+    name: '國立成功商水 官方網站正式校徽 (正版實體徽章)',
+    desc: '臺東縣國立成功商業水產職業學校官方首頁正版標準校徽',
+    icon: <Sparkles className="w-8 h-8 text-sky-400" />,
+    svg: '/official_ckvs_logo.jpg'
   },
   {
-    id: 'academic-school',
-    name: '現代學府 卓越校徽',
-    desc: '莊嚴現代學校建築殿堂與教務卓越象徵',
+    id: 'ckvs-official',
+    name: '國立成功商水 官方紀念校徽 (海豚躍浪·深藍金環款)',
+    desc: '躍起海豚象徵大躍進，融合商業古幣與水產浩瀚太平洋浪花',
+    icon: <Sparkles className="w-8 h-8 text-sky-400" />,
+    svg: '/ckvs_logo.svg'
+  },
+  {
+    id: 'ckvs-coin-water',
+    name: '成功商水 創校精神徽 (古幣與流水)',
+    desc: '以「錢幣」代表商業、「流水」代表水產之經典創校意象',
     icon: <School className="w-8 h-8 text-indigo-400" />,
-    svg: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzQzMzhjYSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzMxMmU4MSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiByeD0iMjgiIGZpbGw9InVybCgjYmcpIiBzdHJva2U9IiM4MThjZjgiIHN0cm9rZS13aWR0aD0iMyIvPjxwYXRoIGQ9Ik02MCAyMiBMOTIgMzggTDI4IDM4IFoiIGZpbGw9IiNmYmJmMjQiLz48cmVjdCB4PSIzNCIgeT0iNDIiIHdpZHRoPSIxMCIgaGVpZ2h0PSI0MiIgZmlsbD0iI2UwZTdmZiIgcng9IjIiLz48cmVjdCB4PSI1NSIgeT0iNDIiIHdpZHRoPSIxMCIgaGVpZ2h0PSI0MiIgZmlsbD0iI2UwZTdmZiIgcng9IjIiLz48cmVjdCB4PSI3NiIgeT0iNDIiIHdpZHRoPSIxMCIgaGVpZ2h0PSI0MiIgZmlsbD0iI2UwZTdmZiIgcng9IjIiLz48cmVjdCB4PSIyNSIgeT0iODQiIHdpZHRoPSI3MCIgaGVpZ2h0PSI4IiBmaWxsPSIjYzdkMmZlIiByeD0iMiIvPjx0ZXh0IHg9IjYwIiB5PSIxMDUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjkiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBsZXR0ZXItc3BhY2luZz0iMSI+5pWZ5YuZ6JmVwrfmlZnlrbjoqK3lgpk8L3RleHQ+PC9zdmc+'
+    svg: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgMTYwIiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InAyX2JnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzBjNGE2ZSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMzY5YTEiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InAyX2dvbGQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZmRlMDQ3Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2Q5NzcwNiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPGNpcmNsZSBjeD0iODAiIGN5PSI4MCIgcj0iNzYiIGZpbGw9InVybCgjcDJfYmcpIiBzdHJva2U9IiMzOGJkZjgiIHN0cm9rZS13aWR0aD0iMyIvPgogIDwhLS0g5Y+k5bmj5aSW55KwICjku6PooajllYbogqopIC0tPgogIDxjaXJjbGUgY3g9IjgwIiBjeT0iODAiIHI9IjUyIiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjcDJfZ29sZCkiIHN0cm9rZS13aWR0aD0iNSIvPgogIDxyZWN0IHg9IjY1IiB5PSI2NSIgd2lkdGg9IjMwIiBoZWlnaHQ9IjMwIiByeD0iNCIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSJ1cmwoI3AyX2dvbGQpIiBzdHJva2Utd2lkdGg9IjMiLz4KICA8IS0tIOa1gemwsua1qua9riAo5Luj6KGo5rC055SiKSAtLT4KICA8cGF0aCBkPSJNIDMyIDg4IFEgNTYgNjggODAgODggVCAxMjggODgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzM4YmRmOCIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNIDMyIDEwMiBRIDU2IDgyIDgwIDEwMiBUIDEyOCAxMDIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdkZDNmYyIgc3Ryb2tlLXdpZHRoPSIzLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDx0ZXh0IHg9IjgwIiB5PSI0NiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGxldHRlci1zcGFjaW5nPSIxIj7lnIvnv4vmiJDlip/llYbogrE8L3RleHQ+CiAgPHRleHQgeD0iODAiIHk9IjgxIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI5IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzAzNjlhMSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+5ZWGIMK3IOawtDwvdGV4dD4KICA8dGV4dCB4PSI4MCIgeT0iMTMyIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iI2ZkZTA0NyIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VEFJVFVORyBDS1ZTPC90ZXh0Pgo8L3N2Zz4='
   },
   {
-    id: 'vocational-crest',
-    name: '技術高工 榮譽院徽',
-    desc: '深造學術、教育榮耀與金質桂冠徽記',
+    id: 'ckvs-30th',
+    name: '成功商水 30週年校慶「旗魚破浪」紀念徽',
+    desc: '旗魚破浪、商水揚帆，象徵昂首邁進新里程碑',
     icon: <GraduationCap className="w-8 h-8 text-emerald-400" />,
-    svg: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJlZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzA2NWY0NiIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzA2NGUzYiIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxjaXJjbGUgY3g9IjYwIiBjeT0iNjAiIHI9IjU2IiBmaWxsPSJ1cmwoI2VnKSIgc3Ryb2tlPSIjMzRkMzk5IiBzdHJva2Utd2lkdGg9IjMiLz48cGF0aCBkPSJNNjAgMjggTDk0IDQ0IEw2MCA2MCBMMjYgNDQgWiIgZmlsbD0iI2ZiYmYyNCIvPjxwYXRoIGQ9Ik00MiA1MyBMNDIgNzQgUTYwIDg0IDc4IDc4IEw3OCA1MyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjMuNSIvPjx0ZXh0IHg9IjYwIiB5PSIxMDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjkiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjNmVlN2I3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5UQUlDSFVORyBTTFZTPC90ZXh0Pjwvc3ZnPg=='
+    svg: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgMTYwIiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InAzX2JnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InAzX2dvbGQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZmRlMDQ3Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2VhYjMwOCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPGNpcmNsZSBjeD0iODAiIGN5PSI4MCIgcj0iNzYiIGZpbGw9InVybCgjcDNfYmcpIiBzdHJva2U9IiMzNGQzOTkiIHN0cm9rZS13aWR0aD0iMyIvPgogIDxjaXJjbGUgY3g9IjgwIiBjeT0iODAiIHI9IjY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM2ZWU3YjciIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtZGFzaGFycmF5PSIzLDMiLz4KICA8IS0tIOegtOa1qumZveW4humIh+aXl+mtmOaEj+ixoSAtLT4KICA8cGF0aCBkPSJNIDQwIDEwNSBMIDgwIDMyIEwgODAgMTA1IFoiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuOTUiLz4KICA8cGF0aCBkPSJNIDg1IDQ1IEwgMTIwIDEwNSBMIDg1IDEwNSBaIiBmaWxsPSIjYTdmM2QwIi8+CiAgPHBhdGggZD0iTSAzMCAxMTIgUSA4MCA5NiAxMzAgMTEyIiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjcDNfZ29sZCkiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHRleHQgeD0iODAiIHk9IjEzNiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iOC41IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBsZXR0ZXItc3BhY2luZz0iMS41Ij7ml5fprZjnoLTmtarlt7sg5ZWG5rC05oWP5bidPC90ZXh0PgogIDx0ZXh0IHg9IjgwIiB5PSIyNSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iOSIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IiNmZGUwNDciIHRleHQtYW5jaG9yPSJtaWRkbGUiPuaIkOWKn+aVn+awtCAzMHRoPC90ZXh0Pgo8L3N2Zz4='
   }
 ];
 
@@ -49,29 +52,23 @@ export const LogoModal: React.FC = () => {
     setIsLogoModalOpen, 
     customLogo, 
     setCustomLogo, 
-    showToast,
-    currentUser,
-    allUsers,
-    setCurrentUser,
-    isAuthenticated,
-    setIsLoginModalOpen
+    showToast
   } = useApp();
 
-  // 權限檢核：僅教務主任且通過認證身分可更換校徽
-  const isAcademicDirector = currentUser.role === 'academic_director' && isAuthenticated;
-
-  const [previewLogo, setPreviewLogo] = useState<string | null>(customLogo);
+  const [previewLogo, setPreviewLogo] = useState<string | null>(customLogo || DEFAULT_SCHOOL_LOGO);
   const [urlInput, setUrlInput] = useState('');
-  const [activeTab, setActiveTab] = useState<'upload' | 'url' | 'presets'>('upload');
+  const [activeTab, setActiveTab] = useState<'upload' | 'presets' | 'url'>('upload');
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 當開啟視窗或外部 customLogo 變動時同步更新預覽
   useEffect(() => {
     if (isLogoModalOpen) {
-      setPreviewLogo(customLogo);
+      setPreviewLogo(customLogo || DEFAULT_SCHOOL_LOGO);
       setUrlInput('');
+      setUploadedFileName(null);
     }
   }, [isLogoModalOpen, customLogo]);
 
@@ -88,53 +85,80 @@ export const LogoModal: React.FC = () => {
     };
   }, [isLogoModalOpen]);
 
-  const handleFileChange = (file: File) => {
-    if (!isAcademicDirector) {
-      showToast('error', '權限受限', '系統校徽已固定鎖定，僅限【教務主任】可更換！');
+  // 核心圖檔解析、最佳化與套用邏輯 (支援寬鬆格式檢查、SVG 免 Canvas 跨域轉換、自動平滑壓縮)
+  const processImageFile = (file: File, autoApply: boolean = false) => {
+    const isImageByMime = file.type && file.type.startsWith('image/');
+    const isImageByExt = /\.(png|jpe?g|svg|webp|gif|bmp|ico|jfif)$/i.test(file.name);
+    
+    if (!isImageByMime && !isImageByExt) {
+      showToast('error', '格式不支援', '請選擇 PNG、JPG、JPEG、SVG、WebP 或 GIF 等圖片檔案。');
       return;
     }
-
-    if (!file.type.startsWith('image/')) {
-      showToast('error', '格式錯誤', '請選擇 PNG、JPG、JPEG、SVG 或 WebP 圖檔。');
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      showToast('error', '檔案過大', '圖片大小請限制在 10MB 以內。');
+    if (file.size > 15 * 1024 * 1024) {
+      showToast('error', '檔案過大', '圖檔大小請控制在 15MB 以內。');
       return;
     }
 
     setIsProcessing(true);
-    const reader = new FileReader();
+    setUploadedFileName(file.name);
 
-    reader.onerror = () => {
+    const finishSuccess = (finalDataUri: string) => {
+      setPreviewLogo(finalDataUri);
       setIsProcessing(false);
-      showToast('error', '檔案讀取異常', '無法讀取該圖檔，請重試或更換圖片。');
+      if (autoApply) {
+        setCustomLogo(finalDataUri);
+        setIsLogoModalOpen(false);
+        showToast('success', '校徽更換成功！', '已成功套用您上傳的校徽 LOGO！');
+      } else {
+        showToast('success', '圖檔載入成功', `已讀取「${file.name}」，可點擊下方按鈕立即套用更換！`);
+      }
     };
 
+    // 處理 SVG 向量圖：直接使用文字讀取轉 Data URI，杜絕 Canvas 跨域/污染錯誤
+    if (file.name.toLowerCase().endsWith('.svg') || (file.type && file.type.includes('svg'))) {
+      const textReader = new FileReader();
+      textReader.onload = (e) => {
+        const text = e.target?.result as string;
+        if (text && text.includes('<svg')) {
+          const svgDataUrl = `data:image/svg+xml;utf8,${encodeURIComponent(text)}`;
+          finishSuccess(svgDataUrl);
+        } else {
+          const dataReader = new FileReader();
+          dataReader.onload = (ev) => {
+            finishSuccess(ev.target?.result as string);
+          };
+          dataReader.readAsDataURL(file);
+        }
+      };
+      textReader.onerror = () => {
+        setIsProcessing(false);
+        showToast('error', '讀取失敗', '無法讀取該向量圖檔，請重試。');
+      };
+      textReader.readAsText(file);
+      return;
+    }
+
+    // 處理點陣圖 (PNG/JPG/WebP)：透過 Canvas 高畫質平滑縮圖（上限 280px，檔案極小且完全適配 Header）
+    const reader = new FileReader();
+    reader.onerror = () => {
+      setIsProcessing(false);
+      showToast('error', '讀取失敗', '無法讀取該圖片，請確認檔案未損毀。');
+    };
     reader.onload = (e) => {
-      const result = e.target?.result as string;
-      if (!result) {
+      const rawDataUrl = e.target?.result as string;
+      if (!rawDataUrl) {
         setIsProcessing(false);
         return;
       }
 
-      // 若為 SVG 向量圖檔，直接套用
-      if (file.type.includes('svg')) {
-        setPreviewLogo(result);
-        setIsProcessing(false);
-        return;
-      }
-
-      // 位元圖檔：透過 HTML Canvas 自動等比壓縮至適當解析度（上限 256px），杜絕 localStorage 配額超載
       try {
         const img = new Image();
         img.onerror = () => {
-          setPreviewLogo(result);
-          setIsProcessing(false);
+          finishSuccess(rawDataUrl);
         };
         img.onload = () => {
           try {
-            const maxDim = 256;
+            const maxDim = 280;
             let w = img.width;
             let h = img.height;
             if (w > maxDim || h > maxDim) {
@@ -147,49 +171,64 @@ export const LogoModal: React.FC = () => {
               }
             }
             const canvas = document.createElement('canvas');
-            canvas.width = w;
-            canvas.height = h;
+            canvas.width = Math.max(1, w);
+            canvas.height = Math.max(1, h);
             const ctx = canvas.getContext('2d');
             if (ctx) {
+              ctx.imageSmoothingEnabled = true;
+              ctx.imageSmoothingQuality = 'high';
               ctx.drawImage(img, 0, 0, w, h);
-              const compressedUrl = canvas.toDataURL('image/png', 0.9);
-              setPreviewLogo(compressedUrl);
+              const compressed = canvas.toDataURL('image/png', 0.95);
+              finishSuccess(compressed);
             } else {
-              setPreviewLogo(result);
+              finishSuccess(rawDataUrl);
             }
           } catch {
-            setPreviewLogo(result);
-          } finally {
-            setIsProcessing(false);
+            finishSuccess(rawDataUrl);
           }
         };
-        img.src = result;
+        img.src = rawDataUrl;
       } catch {
-        setPreviewLogo(result);
-        setIsProcessing(false);
+        finishSuccess(rawDataUrl);
       }
     };
-
     reader.readAsDataURL(file);
+  };
+
+  // 剪貼簿貼上圖片 (Ctrl+V) 支援
+  useEffect(() => {
+    if (!isLogoModalOpen) return;
+    const handlePaste = (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+          const file = items[i].getAsFile();
+          if (file) {
+            e.preventDefault();
+            processImageFile(file, true);
+            break;
+          }
+        }
+      }
+    };
+    window.addEventListener('paste', handlePaste);
+    return () => window.removeEventListener('paste', handlePaste);
+  }, [isLogoModalOpen]);
+
+  const handleFileChange = (file: File) => {
+    processImageFile(file, true);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    if (!isAcademicDirector) {
-      showToast('error', '權限受限', '系統校徽已固定鎖定，僅限【教務主任】可更換！');
-      return;
-    }
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      handleFileChange(e.dataTransfer.files[0]);
+      processImageFile(e.dataTransfer.files[0], true);
     }
   };
 
   const handleApplyUrl = () => {
-    if (!isAcademicDirector) {
-      showToast('error', '權限受限', '系統校徽已固定鎖定，僅限【教務主任】可更換！');
-      return;
-    }
     const trimmed = urlInput.trim();
     if (!trimmed) {
       showToast('warning', '請輸入網址', '請輸入正確的圖片網址。');
@@ -200,70 +239,45 @@ export const LogoModal: React.FC = () => {
   };
 
   const handleSave = () => {
-    if (!isAcademicDirector) {
-      showToast('error', '權限受限', '系統校徽已固定鎖定，僅限【教務主任】登入後方可更換！');
+    if (!previewLogo) {
+      showToast('warning', '請先選擇或上傳圖片', '請選擇預設校徽或上傳圖檔。');
       return;
     }
     setCustomLogo(previewLogo);
     setIsLogoModalOpen(false);
-    showToast('success', '校徽 LOGO 已更新', '教務主任已成功更換全校系統校徽！');
+    showToast('success', '校徽更換完成', '全校系統首頁 LOGO 已更新為新校徽！');
   };
 
   const handleReset = () => {
-    if (!isAcademicDirector) {
-      showToast('error', '權限受限', '系統校徽已固定鎖定，僅限【教務主任】登入後方可更換！');
-      return;
-    }
-    setPreviewLogo(null);
-    setCustomLogo(null);
-    setUrlInput('');
+    setPreviewLogo(DEFAULT_SCHOOL_LOGO);
+    setCustomLogo(DEFAULT_SCHOOL_LOGO);
     setIsLogoModalOpen(false);
-    showToast('info', '已恢復預設圖示', '已還原為系統標準校徽圖示。');
-  };
-
-  const handleSwitchToDirectorLogin = () => {
-    const directorUser = allUsers.find(u => u.role === 'academic_director');
-    if (directorUser) {
-      setCurrentUser(directorUser);
-    }
-    setIsLogoModalOpen(false);
-    setIsLoginModalOpen(true);
-    showToast('info', '請以教務主任帳號登入', '請輸入教務主任 (魏主任) 之驗證密碼進行登入認證。');
+    showToast('info', '已恢復預設校徽', '系統校徽已恢復為國立成功商水官方標準校徽。');
   };
 
   if (!isLogoModalOpen) return null;
 
+  const isDifferentFromCurrent = previewLogo !== customLogo;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto animate-in fade-in">
-      <div className="bg-white rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden border border-slate-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto animate-in fade-in">
+      <div className="bg-white rounded-2xl w-full max-w-xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-200">
         
-        {/* 頂部標題列 */}
-        <div className="bg-slate-900 px-6 py-4 flex items-center justify-between text-white border-b border-slate-800">
+        {/* 頂部標題列 (固定) */}
+        <div className="bg-slate-900 px-6 py-4 flex items-center justify-between text-white border-b border-slate-800 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${
-              isAcademicDirector 
-                ? 'bg-amber-500/20 text-amber-400 border-amber-400/30' 
-                : 'bg-slate-800 text-slate-400 border-slate-700'
-            }`}>
-              {isAcademicDirector ? <Sparkles className="w-4 h-4" /> : <Lock className="w-4 h-4 text-amber-400" />}
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center border bg-sky-500/20 text-sky-400 border-sky-400/30">
+              <Sparkles className="w-4 h-4" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-base text-white">系統校徽 LOGO 圖示管理</h3>
-                {isAcademicDirector ? (
-                  <span className="px-2 py-0.5 text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full flex items-center gap-1">
-                    <ShieldCheck className="w-3 h-3" /> 主任專屬授權
-                  </span>
-                ) : (
-                  <span className="px-2 py-0.5 text-[10px] font-bold bg-slate-800 text-amber-400 border border-amber-500/40 rounded-full flex items-center gap-1">
-                    <Lock className="w-3 h-3" /> 已安全固定
-                  </span>
-                )}
+                <h3 className="font-bold text-base text-white">更換系統首頁校徽 LOGO</h3>
+                <span className="px-2 py-0.5 text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3" /> 自訂上傳即時生效
+                </span>
               </div>
               <p className="text-xs text-slate-400">
-                {isAcademicDirector 
-                  ? '教務主任具備全校首頁及各項公務借用單據校徽更換管理權限' 
-                  : '系統校徽已固定鎖定，除教務主任登入外無法更換'}
+                可上傳本機圖檔、輸入圖片網址或選擇精選校徽，更換後將即時同步於首頁導覽列
               </p>
             </div>
           </div>
@@ -276,282 +290,292 @@ export const LogoModal: React.FC = () => {
           </button>
         </div>
 
-        <div className="p-6 space-y-5">
+        {/* 內容主體區 (可平滑滾動) */}
+        <div className="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1 min-h-0">
+          
           {/* 當前即時預覽區 */}
-          <div className="bg-slate-900 rounded-xl p-4 text-white border border-slate-800 flex items-center gap-4">
-            <div className="relative">
-              <div className="w-16 h-16 rounded-xl bg-slate-800 border-2 border-sky-500/50 flex items-center justify-center overflow-hidden shadow-inner p-1">
-                {previewLogo ? (
-                  <img 
-                    src={previewLogo} 
-                    alt="校徽預覽" 
-                    referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                    className="w-full h-full object-contain"
-                  />
-                ) : (
-                  <div className="w-full h-full rounded-lg bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center">
-                    <School className="w-8 h-8 text-white" />
-                  </div>
-                )}
+          <div className="bg-slate-900 rounded-xl p-4 text-white border border-slate-800 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="relative shrink-0">
+                <div className="w-16 h-16 rounded-xl bg-white border-2 border-sky-500/70 flex items-center justify-center overflow-hidden shadow-inner p-1.5">
+                  {previewLogo ? (
+                    <img 
+                      src={previewLogo} 
+                      alt="校徽預覽" 
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <School className="w-8 h-8 text-slate-400" />
+                  )}
+                </div>
+                <span className="absolute -bottom-1 -right-1 px-1.5 py-0.2 text-[9px] font-bold bg-sky-500 text-white rounded-full">
+                  預覽
+                </span>
               </div>
-              <span className="absolute -bottom-1 -right-1 bg-sky-600 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full border border-slate-900">
-                預覽
-              </span>
+              <div>
+                <div className="text-xs text-sky-400 font-semibold mb-0.5">目前選取之校徽效果</div>
+                <div className="text-sm font-bold text-white flex items-center gap-1.5">
+                  國立成功商水
+                  {previewLogo === DEFAULT_SCHOOL_LOGO && (
+                    <span className="text-[10px] font-normal px-1.5 py-0.5 bg-sky-950 text-sky-300 rounded border border-sky-700/50">
+                      官方標準款
+                    </span>
+                  )}
+                </div>
+                <div className="text-[11px] text-slate-400 mt-0.5">
+                  {uploadedFileName ? `已載入本機檔案：${uploadedFileName}` : '套用後首頁導覽列與單據將即刻更新'}
+                </div>
+              </div>
             </div>
 
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-sky-400 font-semibold uppercase tracking-wider">
-                  全校主頁與單據效果
-                </span>
-                <span className="text-[10px] px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded">
-                  已固定鎖定保護
-                </span>
-              </div>
-              <div className="text-sm sm:text-base font-bold text-white tracking-tight truncate mt-0.5">
-                教務處教學設備與教室借用系統
-              </div>
-              <p className="text-xs text-slate-400 mt-0.5">
-                {customLogo ? '已套用學校固定自訂校徽，全校教職員使用介面均以此圖示呈現' : '目前使用標準預設校徽圖示'}
-              </p>
-            </div>
+            {/* 若有新選取的預覽，提供頂部捷徑立即套用 */}
+            {isDifferentFromCurrent && (
+              <button
+                type="button"
+                onClick={handleSave}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg shadow transition-all cursor-pointer shrink-0"
+              >
+                <Check className="w-3.5 h-3.5" />
+                立即套用
+              </button>
+            )}
           </div>
 
-          {/* 非教務主任身分：安全鎖定提示與登入切換 */}
-          {!isAcademicDirector ? (
-            <div className="space-y-4">
-              <div className="bg-amber-50/80 border border-amber-200 rounded-xl p-4 text-left space-y-3">
-                <div className="flex items-center gap-2 text-amber-800 font-bold text-sm">
-                  <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0" />
-                  <span>權限受限：校徽圖示已固定鎖定</span>
+          {/* 分頁切換 */}
+          <div className="flex border-b border-slate-200">
+            <button
+              type="button"
+              onClick={() => setActiveTab('upload')}
+              className={`pb-2.5 px-4 text-xs font-bold transition-all relative flex items-center gap-1.5 cursor-pointer ${
+                activeTab === 'upload'
+                  ? 'text-sky-600 border-b-2 border-sky-600'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <Upload className="w-3.5 h-3.5" />
+              本地上傳圖檔 (推薦)
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('presets')}
+              className={`pb-2.5 px-4 text-xs font-bold transition-all relative flex items-center gap-1.5 cursor-pointer ${
+                activeTab === 'presets'
+                  ? 'text-sky-600 border-b-2 border-sky-600'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <School className="w-3.5 h-3.5" />
+              精選校徽樣式
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('url')}
+              className={`pb-2.5 px-4 text-xs font-bold transition-all relative flex items-center gap-1.5 cursor-pointer ${
+                activeTab === 'url'
+                  ? 'text-sky-600 border-b-2 border-sky-600'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <FileImage className="w-3.5 h-3.5" />
+              圖片網址 (URL)
+            </button>
+          </div>
+
+          {/* Tab 1: 本地上傳 */}
+          {activeTab === 'upload' && (
+            <div className="space-y-3">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,.svg,.png,.jpg,.jpeg,.webp,.gif"
+                className="hidden"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files.length > 0) {
+                    processImageFile(e.target.files[0], true);
+                  }
+                  e.target.value = '';
+                }}
+              />
+
+              {/* 拖曳與點擊上傳區 */}
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                className={`border-2 border-dashed rounded-xl p-6 sm:p-8 text-center cursor-pointer transition-all ${
+                  isDragging
+                    ? 'border-sky-500 bg-sky-50/90 scale-[0.99] ring-2 ring-sky-300'
+                    : 'border-slate-300 hover:border-sky-400 hover:bg-slate-50/80 bg-slate-50/40'
+                }`}
+              >
+                <div className="w-12 h-12 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center mx-auto mb-2.5">
+                  <Upload className="w-6 h-6" />
                 </div>
-                <p className="text-xs text-amber-700 leading-relaxed">
-                  依據學校資訊安全管理規範，本系統校徽已固定設定完畢。為確保校級系統介面嚴謹與統一性，<strong>除【教務主任】登入後可進行更換外，一般教職員與承辦人員均無法修改此圖示</strong>。
+                <p className="text-sm font-bold text-slate-800">
+                  {isProcessing ? '正在處理與最佳化圖檔...' : '點擊選擇校徽圖檔 或 將圖片拖曳至此'}
                 </p>
-
-                <div className="bg-white/80 rounded-lg p-3 border border-amber-100 text-xs space-y-1">
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">目前登入帳號：</span>
-                    <span className="font-bold text-slate-800">{currentUser.username} - {currentUser.name}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">目前職稱單位：</span>
-                    <span className="text-slate-700">{currentUser.title} / {currentUser.department}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">校徽管理權限：</span>
-                    <span className="font-semibold text-rose-600 flex items-center gap-1">
-                      <Lock className="w-3 h-3" /> 無權限變更 (僅檢視)
-                    </span>
-                  </div>
+                <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+                  支援格式：PNG、JPG、JPEG、SVG、WebP（亦可直接按下 <kbd className="px-1 py-0.5 bg-slate-200 rounded text-slate-700 font-mono text-[10px]">Ctrl+V</kbd> 貼上截圖）
+                </p>
+                
+                <div className="mt-4 flex items-center justify-center gap-2">
+                  <span className="px-3.5 py-1.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors inline-flex items-center gap-1.5">
+                    <Upload className="w-3.5 h-3.5" />
+                    瀏覽電腦檔案
+                  </span>
                 </div>
               </div>
 
-              <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsLogoModalOpen(false)}
-                  className="w-full sm:w-auto px-4 py-2.5 text-xs text-slate-600 hover:text-slate-800 font-medium rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
-                >
-                  關閉視窗
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSwitchToDirectorLogin}
-                  className="w-full sm:w-auto px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-md shadow-amber-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <KeyRound className="w-4 h-4" />
-                  以【教務主任】身分登入更換
-                </button>
-              </div>
-            </div>
-          ) : (
-            /* 教務主任專屬更換介面 */
-            <>
-              <div className="flex items-center gap-2 bg-emerald-50 text-emerald-800 p-2.5 rounded-xl border border-emerald-200 text-xs font-semibold">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>教務主任權限認證通過 ({currentUser.name})：您可以執行更換校徽、上傳新圖檔或還原預設。</span>
-              </div>
-
-              {/* 模式切換分頁 */}
-              <div className="flex border-b border-slate-200">
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('upload')}
-                  className={`flex-1 py-2.5 text-xs sm:text-sm font-semibold border-b-2 flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
-                    activeTab === 'upload'
-                      ? 'border-sky-600 text-sky-600 bg-sky-50/50'
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  <Upload className="w-4 h-4" />
-                  本地上傳圖檔
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('presets')}
-                  className={`flex-1 py-2.5 text-xs sm:text-sm font-semibold border-b-2 flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
-                    activeTab === 'presets'
-                      ? 'border-sky-600 text-sky-600 bg-sky-50/50'
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  <Sparkles className="w-4 h-4" />
-                  內建精選校徽
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('url')}
-                  className={`flex-1 py-2.5 text-xs sm:text-sm font-semibold border-b-2 flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
-                    activeTab === 'url'
-                      ? 'border-sky-600 text-sky-600 bg-sky-50/50'
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  <Link className="w-4 h-4" />
-                  輸入圖片網址
-                </button>
-              </div>
-
-              {/* Tab 1: 本地上傳 */}
-              {activeTab === 'upload' && (
-                <div className="space-y-3">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/webp"
-                    className="hidden"
-                    onChange={(e) => {
-                      if (e.target.files && e.target.files.length > 0) {
-                        handleFileChange(e.target.files[0]);
-                      }
-                    }}
-                  />
-                  <div
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      setIsDragging(true);
-                    }}
-                    onDragLeave={() => setIsDragging(false)}
-                    onDrop={handleDrop}
-                    onClick={() => fileInputRef.current?.click()}
-                    className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
-                      isDragging
-                        ? 'border-sky-500 bg-sky-50/80 scale-[0.99]'
-                        : 'border-slate-300 hover:border-sky-400 hover:bg-slate-50'
-                    }`}
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center mx-auto mb-3">
-                      <Upload className="w-6 h-6" />
+              {/* 當有載入新圖檔時的特別提示與立即套用按鈕 */}
+              {isDifferentFromCurrent && (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <div>
+                      <div className="text-xs font-bold text-emerald-900">新校徽已載入就緒！</div>
+                      <div className="text-[11px] text-emerald-700">點選右側按鈕立即完成系統首頁更換</div>
                     </div>
-                    <p className="text-sm font-bold text-slate-800">
-                      {isProcessing ? '正在處理圖檔...' : '點擊選擇校徽圖檔 或 將圖片拖曳至此'}
-                    </p>
-                    <p className="text-xs text-slate-500 mt-1">
-                      支援格式：PNG、JPG、JPEG、SVG、WebP（建議使用透明背景圖，系統會自動優化儲存）
-                    </p>
                   </div>
-                </div>
-              )}
-
-              {/* Tab 2: 內建精選樣式 */}
-              {activeTab === 'presets' && (
-                <div className="space-y-3">
-                  <p className="text-xs text-slate-500">
-                    點選以下任一徽章樣式即可直接套用為首頁 LOGO：
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {PRESET_LOGOS.map((preset) => (
-                      <button
-                        type="button"
-                        key={preset.id}
-                        onClick={() => setPreviewLogo(preset.svg)}
-                        className={`p-3 rounded-xl border text-left flex flex-col items-center text-center transition-all cursor-pointer ${
-                          previewLogo === preset.svg
-                            ? 'border-sky-600 bg-sky-50 shadow-md ring-2 ring-sky-500/20'
-                            : 'border-slate-200 hover:border-sky-300 hover:bg-slate-50'
-                        }`}
-                      >
-                        <div className="w-14 h-14 rounded-xl overflow-hidden mb-2 shadow-sm border border-slate-200/80 bg-white flex items-center justify-center p-1">
-                          <img 
-                            src={preset.svg} 
-                            alt={preset.name} 
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
-                        <span className="font-bold text-xs text-slate-800">{preset.name}</span>
-                        <span className="text-[11px] text-slate-500 mt-0.5 line-clamp-2">{preset.desc}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Tab 3: 圖片網址 */}
-              {activeTab === 'url' && (
-                <div className="space-y-3">
-                  <label className="block text-xs font-semibold text-slate-700">
-                    線上圖片網址 (URL)
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="url"
-                      placeholder="https://example.com/logo.png"
-                      value={urlInput}
-                      onChange={(e) => setUrlInput(e.target.value)}
-                      className="flex-1 px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleApplyUrl}
-                      className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-xl transition-colors shrink-0 cursor-pointer"
-                    >
-                      載入測試
-                    </button>
-                  </div>
-                  <p className="text-[11px] text-slate-500 flex items-center gap-1">
-                    <Info className="w-3.5 h-3.5 text-sky-500" />
-                    可輸入各機關學校官方網站公開發布之校徽圖檔連結。
-                  </p>
-                </div>
-              )}
-
-              {/* 底部操作按鈕 */}
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={handleReset}
-                  className="text-xs text-slate-500 hover:text-rose-600 flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  恢復預設圖示
-                </button>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsLogoModalOpen(false)}
-                    className="px-4 py-2 text-xs text-slate-600 hover:text-slate-800 font-medium rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
-                  >
-                    取消
-                  </button>
                   <button
                     type="button"
                     onClick={handleSave}
-                    className="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-600/20 transition-all flex items-center gap-1.5 cursor-pointer"
+                    className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow transition-colors flex items-center gap-1 cursor-pointer shrink-0"
                   >
-                    <Check className="w-4 h-4" />
-                    確認套用更換
+                    立即套用更換
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
+              )}
+            </div>
+          )}
+
+          {/* Tab 2: 內建精選樣式 */}
+          {activeTab === 'presets' && (
+            <div className="space-y-3">
+              <p className="text-xs text-slate-500">
+                點選以下任一徽章樣式即可預覽並更換為首頁校徽：
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {PRESET_LOGOS.map((preset) => (
+                  <div
+                    key={preset.id}
+                    onClick={() => {
+                      setPreviewLogo(preset.svg);
+                      setUploadedFileName(null);
+                      showToast('info', '已載入樣式預覽', `已載入「${preset.name}」`);
+                    }}
+                    className={`p-3 rounded-xl border text-left flex items-center justify-between gap-3 transition-all cursor-pointer ${
+                      previewLogo === preset.svg
+                        ? 'border-sky-600 bg-sky-50 shadow-md ring-2 ring-sky-500/20'
+                        : 'border-slate-200 hover:border-sky-300 hover:bg-slate-50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-slate-200 bg-white flex items-center justify-center p-1 shrink-0">
+                        <img 
+                          src={preset.svg} 
+                          alt={preset.name} 
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="font-bold text-xs text-slate-800 block truncate">{preset.name}</span>
+                        <span className="text-[11px] text-slate-500 line-clamp-1">{preset.desc}</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPreviewLogo(preset.svg);
+                        setCustomLogo(preset.svg);
+                        setIsLogoModalOpen(false);
+                        showToast('success', '校徽更換成功！', `已成功套用「${preset.name}」！`);
+                      }}
+                      className="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-lg shrink-0 cursor-pointer shadow-sm transition-all"
+                    >
+                      立即套用
+                    </button>
+                  </div>
+                ))}
               </div>
-            </>
+            </div>
+          )}
+
+          {/* Tab 3: 圖片網址 */}
+          {activeTab === 'url' && (
+            <div className="space-y-3">
+              <label className="block text-xs font-semibold text-slate-700">
+                線上圖片網址 (URL)
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  placeholder="https://example.com/school_logo.png"
+                  value={urlInput}
+                  onChange={(e) => setUrlInput(e.target.value)}
+                  className="flex-1 px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={handleApplyUrl}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-xl transition-colors shrink-0 cursor-pointer"
+                >
+                  載入測試
+                </button>
+              </div>
+              <p className="text-[11px] text-slate-500 flex items-center gap-1">
+                <Info className="w-3.5 h-3.5 text-sky-500" />
+                可輸入官方公開發布之校徽圖檔連結，載入確認後點選下方「確認套用更換」。
+              </p>
+            </div>
           )}
 
         </div>
+
+        {/* 底部固定操作列 (固定不隨內容滑動) */}
+        <div className="shrink-0 bg-slate-50 border-t border-slate-200 px-6 py-3.5 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={handleReset}
+            className="text-xs text-slate-500 hover:text-sky-600 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-sky-50 transition-colors cursor-pointer"
+            title="將首頁校徽恢復為國立成功商水官方標準校徽"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            恢復國立成功商水官方校徽
+          </button>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsLogoModalOpen(false)}
+              className="px-4 py-2 text-xs text-slate-600 hover:text-slate-800 font-medium rounded-xl hover:bg-slate-200/60 transition-colors cursor-pointer"
+            >
+              取消
+            </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              className={`px-5 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow ${
+                isDifferentFromCurrent
+                  ? 'bg-sky-600 hover:bg-sky-700 text-white shadow-sky-600/30 ring-2 ring-sky-400/40 animate-pulse'
+                  : 'bg-slate-800 hover:bg-slate-700 text-white'
+              }`}
+            >
+              <Check className="w-4 h-4" />
+              確認套用更換
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   );
