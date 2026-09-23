@@ -12,7 +12,7 @@ import {
   Link,
   Camera
 } from 'lucide-react';
-import { LOCKED_ROOM_IMAGES, INITIAL_RESOURCES } from '../data/mockData';
+import { LOCKED_ROOM_IMAGES, LOCKED_CLASSROOM_IDS, INITIAL_RESOURCES } from '../data/mockData';
 
 interface ResourceImageModalProps {
   resource: ResourceItem | null;
@@ -41,7 +41,7 @@ export const ResourceImageModal: React.FC<ResourceImageModalProps> = ({
     }
   }, [resource, isOpen]);
 
-  if (!isOpen || !resource) return null;
+  if (!isOpen || !resource || LOCKED_CLASSROOM_IDS.includes(resource.id)) return null;
 
   // 壓縮圖片成合適大小的 DataURL，避免超出 localStorage 容量
   const handleFileSelect = (file: File) => {

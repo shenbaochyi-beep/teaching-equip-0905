@@ -13,7 +13,8 @@ import {
   INITIAL_RESOURCES, 
   INITIAL_RESERVATIONS, 
   INITIAL_NOTIFICATIONS,
-  LOCKED_ROOM_IMAGES
+  LOCKED_ROOM_IMAGES,
+  LOCKED_CLASSROOM_IDS
 } from '../data/mockData';
 import { 
   getTodayString, 
@@ -233,15 +234,106 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
   const [isLogoModalOpen, setIsLogoModalOpen] = useState<boolean>(false);
 
+  // 自動搜尋並恢復使用者原先上傳之實景照片 (掃描歷史版本備份與各項可能儲存之 key)
+  const findOriginalUploadedPhotos = (): Record<string, string> => {
+    const recovered: Record<string, string> = {};
+    if (typeof window === 'undefined') return recovered;
+
+    const targetIds = ['res-av-room', 'res-coop-room', 'res-multi-room', 'res-living-tech-room'];
+
+    // 1. 先檢驗個別永久保存的相片鍵
+    targetIds.forEach(id => {
+      const p1 = safeStorage.getItem(`school_equip_original_uploaded_photo_${id}`);
+      const p2 = safeStorage.getItem(`custom_room_photo_${id}`);
+      if (p1 && (p1.startsWith('data:image/') || p1.length > 50)) recovered[id] = p1;
+      else if (p2 && (p2.startsWith('data:image/') || p2.length > 50)) recovered[id] = p2;
+    });
+
+    // 2. 檢驗 window.localStorage 與 window.sessionStorage 中所有歷史 key
+    const stores = [
+      typeof window !== 'undefined' ? window.localStorage : null,
+      typeof window !== 'undefined' ? window.sessionStorage : null
+    ].filter(Boolean) as Storage[];
+
+    stores.forEach(store => {
+      try {
+        for (let i = 0; i < store.length; i++) {
+          const key = store.key(i);
+          if (!key) continue;
+          const val = store.getItem(key);
+          if (!val) continue;
+
+          // 若為針對個別資源儲存的 Base64
+          targetIds.forEach(id => {
+            if (!recovered[id] && key.includes(id) && val.startsWith('data:image/')) {
+              recovered[id] = val;
+            }
+          });
+
+          // 若為 JSON 格式 (例如舊版資源陣列或物件)
+          if (val.startsWith('[') || val.startsWith('{')) {
+            try {
+              const data = JSON.parse(val);
+              if (Array.isArray(data)) {
+                data.forEach(item => {
+                  if (item && targetIds.includes(item.id) && item.imageUrl) {
+                    if (item.imageUrl.startsWith('data:image/') && !recovered[item.id]) {
+                      recovered[item.id] = item.imageUrl;
+                    }
+                  }
+                });
+              } else if (typeof data === 'object' && data !== null) {
+                targetIds.forEach(id => {
+                  if (data[id] && typeof data[id] === 'string' && data[id].startsWith('data:image/') && !recovered[id]) {
+                    recovered[id] = data[id];
+                  }
+                });
+              }
+            } catch {
+              // ignore json parse error
+            }
+          }
+        }
+      } catch {
+        // ignore storage access error
+      }
+    });
+
+    return recovered;
+  };
+
   const [resources, setResources] = useState<ResourceItem[]>(() => {
     const saved = safeStorage.getItem(STORAGE_KEYS.RESOURCES);
     const parsed = saved ? safeJsonParse<ResourceItem[]>(saved, INITIAL_RESOURCES) : INITIAL_RESOURCES;
+    const recoveredPhotos = findOriginalUploadedPhotos();
 
-    // 依據最新 INITIAL_RESOURCES 之權威排序與設定進行同步，確保 4 間教室排於前 4 位且可自訂實景相片
     const existingMap = new Map(parsed.map(item => [item.id, item]));
     const finalResources = INITIAL_RESOURCES.map(initial => {
       const existing = existingMap.get(initial.id);
-      if (!existing) return initial;
+      
+      // 圖片選取優先級：
+      // 1. 已鎖定之照片 (school_equip_locked_photo_[id])
+      // 2. 自動恢復之使用者原上傳照片 (recoveredPhotos)
+      // 3. 既有 existing.imageUrl (例如剛剛重新上傳儲存的照片)
+      // 4. initial.imageUrl
+      let targetImageUrl = initial.imageUrl;
+      const lockedPhoto = safeStorage.getItem(`school_equip_locked_photo_${initial.id}`);
+      if (lockedPhoto) {
+        targetImageUrl = lockedPhoto;
+      } else if (recoveredPhotos[initial.id]) {
+        targetImageUrl = recoveredPhotos[initial.id];
+      } else if (existing?.imageUrl) {
+        targetImageUrl = existing.imageUrl;
+      }
+
+      // 若為 4 間專用教室，將目前最新設定之實景照片永久鎖定保存
+      if (LOCKED_CLASSROOM_IDS.includes(initial.id) && targetImageUrl) {
+        safeStorage.setItem(`school_equip_locked_photo_${initial.id}`, targetImageUrl);
+        safeStorage.setItem(`school_equip_original_uploaded_photo_${initial.id}`, targetImageUrl);
+        safeStorage.setItem(`custom_room_photo_${initial.id}`, targetImageUrl);
+      }
+
+      if (!existing) return { ...initial, imageUrl: targetImageUrl };
       return {
         ...existing,
         name: initial.name,
@@ -251,7 +343,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         specs: initial.specs,
         description: initial.description,
         cautionNotes: initial.cautionNotes,
-        imageUrl: existing.imageUrl || initial.imageUrl
+        imageUrl: targetImageUrl
       };
     });
 
@@ -362,6 +454,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const removeToast = (id: string) => {
     setToasts(prev => prev.filter(t => t.id !== id));
   };
+
+  useEffect(() => {
+    // 確保 4 間專用教室之目前實景照片持續受到永久鎖定保護
+    LOCKED_CLASSROOM_IDS.forEach(id => {
+      const currentRes = resources.find(r => r.id === id);
+      if (currentRes && currentRes.imageUrl) {
+        safeStorage.setItem(`school_equip_locked_photo_${id}`, currentRes.imageUrl);
+        safeStorage.setItem(`school_equip_original_uploaded_photo_${id}`, currentRes.imageUrl);
+      }
+    });
+  }, [resources]);
 
   // 資安登入驗證處理：需帳號完全符合才能登入
   const loginWithAccount = (
@@ -917,14 +1020,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('info', '資源狀態已更新', '設備/教室現況已即時變更');
   };
 
-  // 場地/設備相片更換（支援各專用教室與各教學設備自訂實景相片上傳）
+  // 場地/設備相片更換（支援教學設備實景相片上傳；4間專用教室照片已鎖定並移除上傳功能）
   const updateResourceImage = (resourceId: string, newImageUrl: string) => {
+    if (LOCKED_CLASSROOM_IDS.includes(resourceId)) {
+      showToast('error', '照片已鎖定', '視聽教室、合作學習教室、多功能學習教室及生活科技/創客教室照片已鎖定，不開放上傳更換。');
+      return;
+    }
+
+    // 永久保存使用者原上傳之實景照片至專屬金鑰
+    safeStorage.setItem(`school_equip_original_uploaded_photo_${resourceId}`, newImageUrl);
+    safeStorage.setItem(`custom_room_photo_${resourceId}`, newImageUrl);
+
     setResources(prev => {
       const updated = prev.map(r => r.id === resourceId ? { ...r, imageUrl: newImageUrl } : r);
       safeStorage.setItem(STORAGE_KEYS.RESOURCES, JSON.stringify(updated));
       return updated;
     });
-    showToast('success', '場地實景相片已成功修訂', '系統總覽卡片、詳細規格與預約單將同步以此圖片呈現。');
+    showToast('success', '設備實景相片已成功修訂', '系統總覽卡片、詳細規格與預約單將同步即時呈現！');
   };
 
   const markNotificationRead = (notificationId: string) => {
@@ -944,11 +1056,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const resetToDefaultData = () => {
-    safeStorage.removeItem(STORAGE_KEYS.RESOURCES);
     safeStorage.removeItem(STORAGE_KEYS.RESERVATIONS);
     safeStorage.removeItem(STORAGE_KEYS.NOTIFICATIONS);
     // 注意：四大教室實景相片與校徽已全數固定鎖定，不隨測試資料重設而清除或變動
-    setResources(INITIAL_RESOURCES);
+    const finalResetResources = INITIAL_RESOURCES.map(r => {
+      const lockedPhoto = safeStorage.getItem(`school_equip_locked_photo_${r.id}`) ||
+                          safeStorage.getItem(`school_equip_original_uploaded_photo_${r.id}`) ||
+                          safeStorage.getItem(`custom_room_photo_${r.id}`);
+      if (lockedPhoto && LOCKED_CLASSROOM_IDS.includes(r.id)) {
+        return { ...r, imageUrl: lockedPhoto };
+      }
+      return r;
+    });
+    setResources(finalResetResources);
+    safeStorage.setItem(STORAGE_KEYS.RESOURCES, JSON.stringify(finalResetResources));
     setReservations(INITIAL_RESERVATIONS);
     setNotifications(INITIAL_NOTIFICATIONS);
     showToast('info', '系統資料已還原', '已重設為標準展示範例資料（四間專用教室實景相片與校徽維持固定鎖定）。');

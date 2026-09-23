@@ -441,6 +441,13 @@ export const INITIAL_USERS: UserProfile[] = [
   }
 ];
 
+export const LOCKED_CLASSROOM_IDS = [
+  'res-av-room',
+  'res-coop-room',
+  'res-multi-room',
+  'res-living-tech-room'
+];
+
 export const LOCKED_ROOM_IMAGES: Record<string, string> = {
   'res-av-room': '/1.jpg',
   'res-coop-room': '/合作.jpg',

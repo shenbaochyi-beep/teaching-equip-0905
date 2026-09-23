@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ResourceItem, ResourceCategory, ResourceStatus } from '../types';
 import { useApp } from '../context/AppContext';
-import { LOCKED_ROOM_IMAGES } from '../data/mockData';
+import { LOCKED_ROOM_IMAGES, LOCKED_CLASSROOM_IDS } from '../data/mockData';
 import { 
   Search, 
   Filter, 
@@ -243,12 +243,12 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent pointer-events-none" />
 
-                  {/* 財產編號與更換相片按鈕 */}
+                  {/* 財產編號 (4間專用教室已鎖定照片並移除上傳相片功能) */}
                   <div className="absolute top-3 left-3 flex items-center gap-1.5 z-10">
                     <span className="bg-slate-900/90 backdrop-blur-sm text-sky-300 text-[11px] font-mono font-semibold px-2 py-0.5 rounded border border-slate-700 shadow">
                       {resource.code}
                     </span>
-                    {onOpenImageModal && (
+                    {onOpenImageModal && !LOCKED_CLASSROOM_IDS.includes(resource.id) && (
                       <button
                         type="button"
                         onClick={(e) => {

@@ -15,6 +15,7 @@ import { ResourceImageModal } from './components/ResourceImageModal';
 import { ToastContainer } from './components/ToastContainer';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ResourceItem, Reservation } from './types';
+import { LOCKED_ROOM_IMAGES, LOCKED_CLASSROOM_IDS } from './data/mockData';
 import { motion, AnimatePresence } from 'motion/react';
 import { ShieldAlert, KeyRound } from 'lucide-react';
 
@@ -38,6 +39,7 @@ const MainAppContent: React.FC = () => {
   };
 
   const handleOpenImageModal = (resource: ResourceItem) => {
+    if (LOCKED_CLASSROOM_IDS.includes(resource.id)) return;
     setSelectedResourceForImage(resource);
   };
 

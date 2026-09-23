@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { ResourceItem } from '../types';
 import { useApp } from '../context/AppContext';
-import { LOCKED_ROOM_IMAGES } from '../data/mockData';
+import { LOCKED_ROOM_IMAGES, LOCKED_CLASSROOM_IDS } from '../data/mockData';
 import { 
   Building, 
   MapPin, 
@@ -102,12 +102,12 @@ export const ResourceDetailModal: React.FC<ResourceDetailModalProps> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent pointer-events-none" />
           
           <div className="absolute top-4 right-4 flex items-center gap-2">
-            {onOpenImageModal && (
+            {onOpenImageModal && !LOCKED_CLASSROOM_IDS.includes(resource.id) && (
               <button
                 type="button"
                 onClick={() => onOpenImageModal(resource)}
                 className="bg-slate-900/80 hover:bg-sky-600 text-slate-200 hover:text-white px-3 py-1.5 rounded-full backdrop-blur transition-all border border-slate-700 hover:border-sky-500 text-xs font-semibold flex items-center gap-1.5 shadow"
-                title="上傳或更換實景照片"
+                title="上傳或更換實景相片"
               >
                 <Camera className="w-3.5 h-3.5" />
                 <span>修訂相片</span>
