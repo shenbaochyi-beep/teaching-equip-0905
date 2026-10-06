@@ -323,15 +323,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const finalResources = INITIAL_RESOURCES.map(initial => {
       const existing = existingMap.get(initial.id);
       
-      // 圖片選取優先級：
-      // 1. 已核定鎖定之照片 (school_equip_locked_photo_[id])
-      // 2. 自動恢復之使用者原上傳照片 (recoveredPhotos)
-      // 3. 既有 existing.imageUrl (例如剛剛重新上傳儲存的照片)
-      // 4. initial.imageUrl
+      // 圖片選取優先級 (嚴格防護：使用者/主任/組長更新之實景照片永久鎖定，絕不回彈成初始範本圖)：
+      // 1. 本機使用者顯式自訂更新之照片 (custom_updated_photo_[id]) - 最高優先，絕不回彈
+      // 2. 既有 existing.imageUrl（若非原始預設範本圖）
+      // 3. 已核定鎖定之照片 (school_equip_locked_photo_[id]，若非原始預設範本圖)
+      // 4. 自動恢復之使用者原上傳照片 (recoveredPhotos)
+      // 5. 初始預設 initial.imageUrl (僅在從未自訂時使用)
+      const isLegacyDemoImage = (url?: string) => !url || 
+        url === '/1.jpg' || 
+        url === '/合作.jpg' || 
+        url === '/543374.jpg' || 
+        url === '/創課.jpg' ||
+        url === '/audiovisual_room.jpg';
+
       let targetImageUrl = initial.imageUrl;
       let isLocked = LOCKED_CLASSROOM_IDS.includes(initial.id);
       let photoLockedBy = isLocked ? '教務處招設組 / 教務主任' : undefined;
-      let photoLockedAt = isLocked ? '系統初裝官方核定' : undefined;
+      let photoLockedAt = isLocked ? '校內官方核定鎖定' : undefined;
 
       const metaStr = safeStorage.getItem(`school_equip_locked_meta_${initial.id}`);
       if (metaStr) {
@@ -345,20 +353,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
       }
 
+      const customUpdated = safeStorage.getItem(`custom_updated_photo_${initial.id}`);
       const lockedPhoto = safeStorage.getItem(`school_equip_locked_photo_${initial.id}`);
-      if (lockedPhoto) {
+
+      if (customUpdated && !isLegacyDemoImage(customUpdated)) {
+        targetImageUrl = customUpdated;
+        isLocked = true;
+      } else if (existing?.imageUrl && !isLegacyDemoImage(existing.imageUrl)) {
+        targetImageUrl = existing.imageUrl;
+        isLocked = true;
+      } else if (lockedPhoto && !isLegacyDemoImage(lockedPhoto)) {
         targetImageUrl = lockedPhoto;
         isLocked = true;
-      } else if (recoveredPhotos[initial.id]) {
+      } else if (recoveredPhotos[initial.id] && !isLegacyDemoImage(recoveredPhotos[initial.id])) {
         targetImageUrl = recoveredPhotos[initial.id];
         isLocked = true;
-      } else if (existing?.imageUrl) {
-        targetImageUrl = existing.imageUrl;
-        if (existing.isPhotoLocked) isLocked = true;
       }
 
       // 所有被鎖定或上傳之照片永久鎖定保存，確保全校同仁登入後均以此照片顯示
-      if (isLocked && targetImageUrl) {
+      if (isLocked && targetImageUrl && !isLegacyDemoImage(targetImageUrl)) {
+        safeStorage.setItem(`custom_updated_photo_${initial.id}`, targetImageUrl);
         safeStorage.setItem(`school_equip_locked_photo_${initial.id}`, targetImageUrl);
         safeStorage.setItem(`school_equip_original_uploaded_photo_${initial.id}`, targetImageUrl);
         safeStorage.setItem(`custom_room_photo_${initial.id}`, targetImageUrl);
@@ -532,43 +546,39 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     let isMounted = true;
 
-    // 1. 初始化立即向中央伺服器索取全系統即時資料庫
-    fetchServerState().then(serverState => {
+    const applyServerSync = (serverState: any) => {
       if (!isMounted || !serverState) return;
-      if (serverState.resources && serverState.resources.length > 0) setResources(serverState.resources);
-      if (serverState.reservations && serverState.reservations.length > 0) setReservations(serverState.reservations);
-      if (serverState.notifications) setNotifications(serverState.notifications);
-      if (serverState.customLogo !== undefined) setCustomLogo(serverState.customLogo);
-    });
+      if (Array.isArray(serverState.resources) && serverState.resources.length > 0) {
+        setResources(serverState.resources);
+        safeStorage.setItem(STORAGE_KEYS.RESOURCES, JSON.stringify(serverState.resources));
+      }
+      if (Array.isArray(serverState.reservations)) {
+        setReservations(serverState.reservations);
+        safeStorage.setItem(STORAGE_KEYS.RESERVATIONS, JSON.stringify(serverState.reservations));
+      }
+      if (Array.isArray(serverState.notifications)) {
+        setNotifications(serverState.notifications);
+        safeStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(serverState.notifications));
+      }
+      if (serverState.customLogo !== undefined) {
+        setCustomLogo(serverState.customLogo);
+        if (serverState.customLogo) safeStorage.setItem(STORAGE_KEYS.CUSTOM_LOGO, serverState.customLogo);
+      }
+    };
+
+    // 1. 初始化立即向中央伺服器索取全系統即時資料庫
+    fetchServerState().then(applyServerSync);
 
     // 2. 建立即時 Server-Sent Events 連線，任一教職員電腦一送出，所有電腦立即收到推播更新
-    const unsubscribe = subscribeServerEvents(serverState => {
-      if (!isMounted || !serverState) return;
-      if (serverState.resources && serverState.resources.length > 0) setResources(serverState.resources);
-      if (serverState.reservations && serverState.reservations.length > 0) setReservations(serverState.reservations);
-      if (serverState.notifications) setNotifications(serverState.notifications);
-      if (serverState.customLogo !== undefined) setCustomLogo(serverState.customLogo);
-    });
+    const unsubscribe = subscribeServerEvents(applyServerSync);
 
     // 3. 背景週期性輪詢核對 (每 3 秒)，確保即使網路暫態斷線重連亦可無縫接續
     const pollInterval = setInterval(() => {
-      fetchServerState().then(serverState => {
-        if (!isMounted || !serverState) return;
-        if (serverState.resources && serverState.resources.length > 0) setResources(serverState.resources);
-        if (serverState.reservations && serverState.reservations.length > 0) setReservations(serverState.reservations);
-        if (serverState.notifications) setNotifications(serverState.notifications);
-        if (serverState.customLogo !== undefined) setCustomLogo(serverState.customLogo);
-      });
+      fetchServerState().then(applyServerSync);
     }, 3000);
 
     const handleFocus = () => {
-      fetchServerState().then(serverState => {
-        if (!isMounted || !serverState) return;
-        if (serverState.resources && serverState.resources.length > 0) setResources(serverState.resources);
-        if (serverState.reservations && serverState.reservations.length > 0) setReservations(serverState.reservations);
-        if (serverState.notifications) setNotifications(serverState.notifications);
-        if (serverState.customLogo !== undefined) setCustomLogo(serverState.customLogo);
-      });
+      fetchServerState().then(applyServerSync);
     };
 
     window.addEventListener('focus', handleFocus);
@@ -1218,6 +1228,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const lockedAt = new Date().toLocaleString('zh-TW', { hour12: false });
 
     // 永久保存使用者原上傳之實景照片至專屬金鑰，並登記鎖定狀態
+    safeStorage.setItem(`custom_updated_photo_${resourceId}`, newImageUrl);
     safeStorage.setItem(`school_equip_original_uploaded_photo_${resourceId}`, newImageUrl);
     safeStorage.setItem(`custom_room_photo_${resourceId}`, newImageUrl);
     safeStorage.setItem(`school_equip_locked_photo_${resourceId}`, newImageUrl);
@@ -1231,6 +1242,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       imageUrl: newImageUrl,
       photoLockedBy: lockedBy,
       isPhotoLocked: true
+    }).then(serverRes => {
+      if (serverRes?.imageUrl) {
+        safeStorage.setItem(`custom_updated_photo_${resourceId}`, serverRes.imageUrl);
+        safeStorage.setItem(`school_equip_locked_photo_${resourceId}`, serverRes.imageUrl);
+        setResources(prev => prev.map(r => r.id === resourceId ? { ...r, imageUrl: serverRes.imageUrl } : r));
+      }
     });
 
     setResources(prev => {

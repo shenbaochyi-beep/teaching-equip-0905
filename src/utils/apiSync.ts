@@ -59,17 +59,21 @@ export async function sendServerReservationUpdate(id: string, updates: Partial<R
 export async function sendServerResourcePhoto(
   resourceId: string, 
   data: { imageUrl: string; photoLockedBy?: string; isPhotoLocked?: boolean }
-): Promise<boolean> {
+): Promise<ResourceItem | null> {
   try {
     const res = await fetch(`/api/resources/${resourceId}/photo`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
-    return res.ok;
+    if (res.ok) {
+      const json = await res.json();
+      return json?.resource || null;
+    }
   } catch (err) {
-    return false;
+    return null;
   }
+  return null;
 }
 
 // 更新校徽至伺服器

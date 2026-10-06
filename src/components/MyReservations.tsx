@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Reservation, ReservationStatus } from '../types';
 import { useApp } from '../context/AppContext';
 import { 
@@ -15,8 +15,11 @@ import {
   ArrowRight,
   ShieldCheck,
   GraduationCap,
-  Sparkles,
-  ChevronDown
+  Sparkles, 
+  ChevronDown,
+  Globe,
+  UserCheck,
+  Radio
 } from 'lucide-react';
 import { daysBetween, getTodayString } from '../utils/dateUtils';
 
@@ -30,18 +33,26 @@ export const MyReservations: React.FC<MyReservationsProps> = ({
   onOpenPrintModal
 }) => {
   const { currentUser, reservations, cancelReservation } = useApp();
+  
+  // 檢視範圍：預設為 'all' (全校即時借用登記)，任一電腦均能即時看到全校借用狀態；亦可切換 'mine' (僅顯示本人填報)
+  const [viewScope, setViewScope] = useState<'all' | 'mine'>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
 
   const todayStr = getTodayString();
 
-  // 取得目前使用者的借用紀錄 (若為管理者則可看全體或個人)
-  const myReservations = reservations.filter(r => {
-    if (currentUser.role === 'faculty') {
-      return r.applicantId === currentUser.id;
+  // 本人填報的借用紀錄
+  const myOwnReservations = useMemo(() => {
+    return reservations.filter(r => r.applicantId === currentUser.id);
+  }, [reservations, currentUser.id]);
+
+  // 依據檢視範圍篩選之基準資料（預設全校即時資料庫）
+  const baseList = useMemo(() => {
+    if (viewScope === 'mine') {
+      return myOwnReservations;
     }
-    return true; // 招設組/主任可在此總覽所有申請
-  });
+    return reservations;
+  }, [reservations, myOwnReservations, viewScope]);
 
   const getStatusDisplay = (status: ReservationStatus) => {
     switch (status) {
@@ -66,7 +77,7 @@ export const MyReservations: React.FC<MyReservationsProps> = ({
     }
   };
 
-  const filteredList = myReservations.filter(res => {
+  const filteredList = baseList.filter(res => {
     if (filterStatus === 'all') return true;
     if (filterStatus === 'active') {
       return res.status === 'borrowed' || res.status === 'extension_pending' || res.status === 'approved' || res.status === 'section_approved' || res.status === 'pending_section';
@@ -83,29 +94,62 @@ export const MyReservations: React.FC<MyReservationsProps> = ({
   return (
     <div className="space-y-6" id="my-reservations">
       
-      {/* 頂部說明與頁籤 */}
+      {/* 檢視範圍切換 (全校即時借用登記 vs 本人借用紀錄) */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-900 text-white p-3.5 rounded-2xl border border-slate-800 shadow">
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => setViewScope('all')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              viewScope === 'all'
+                ? 'bg-sky-600 text-white shadow-md ring-2 ring-sky-400'
+                : 'bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700'
+            }`}
+          >
+            <Globe className="w-3.5 h-3.5 text-sky-400" />
+            全校即時借用登記 ({reservations.length})
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-0.5" title="跨電腦即時連動中"></span>
+          </button>
+          <button
+            onClick={() => setViewScope('mine')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              viewScope === 'mine'
+                ? 'bg-sky-600 text-white shadow-md ring-2 ring-sky-400'
+                : 'bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700'
+            }`}
+          >
+            <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+            我填報的借用 ({myOwnReservations.length})
+          </button>
+        </div>
+        <div className="text-[11px] text-slate-300 flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          全系統即時同步：任一電腦填報或審核，本頁即刻自動連線更新
+        </div>
+      </div>
+
+      {/* 頂部說明與狀態頁籤 */}
       <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
             <Inbox className="w-5 h-5 text-sky-600" />
-            借用申請紀錄與進度追蹤
+            {viewScope === 'all' ? '全校借用登記與進度追蹤 (跨電腦即時連動)' : '我的借用申請紀錄與進度追蹤'}
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            {currentUser.role === 'faculty'
-              ? `目前登入教職員：${currentUser.name} (${currentUser.department})，可於此隨時查看簽核進度、列印借用聯或申請特殊延長`
-              : `管理員檢視模式：目前共 ${reservations.length} 筆全校借用登記紀錄`}
+            {viewScope === 'all'
+              ? `目前顯示全校即時借用登記共 ${reservations.length} 筆（包含全校同仁登記之教室與設備），點選上方可切換個人紀錄`
+              : `目前顯示 ${currentUser.name} 老師填報之借用案共 ${myOwnReservations.length} 筆`}
           </p>
         </div>
 
         {/* 狀態過濾按鈕 */}
-        <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200">
+        <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200 flex-wrap">
           <button
             onClick={() => setFilterStatus('all')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
               filterStatus === 'all' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            全部 ({myReservations.length})
+            全部 ({baseList.length})
           </button>
           <button
             onClick={() => setFilterStatus('active')}
@@ -113,7 +157,7 @@ export const MyReservations: React.FC<MyReservationsProps> = ({
               filterStatus === 'active' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            進行中/審核中 ({myReservations.filter(r => r.status !== 'returned' && r.status !== 'cancelled' && !r.status.startsWith('rejected')).length})
+            進行中/審核中 ({baseList.filter(r => r.status !== 'returned' && r.status !== 'cancelled' && !r.status.startsWith('rejected')).length})
           </button>
           <button
             onClick={() => setFilterStatus('extensions')}
@@ -121,7 +165,7 @@ export const MyReservations: React.FC<MyReservationsProps> = ({
               filterStatus === 'extensions' ? 'bg-purple-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            特殊延長申請 ({myReservations.filter(r => r.extension !== undefined).length})
+            特殊延長申請 ({baseList.filter(r => r.extension !== undefined).length})
           </button>
           <button
             onClick={() => setFilterStatus('completed')}
@@ -129,7 +173,7 @@ export const MyReservations: React.FC<MyReservationsProps> = ({
               filterStatus === 'completed' ? 'bg-slate-800 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            已歸還結案 ({myReservations.filter(r => r.status === 'returned').length})
+            已歸還結案 ({baseList.filter(r => r.status === 'returned').length})
           </button>
         </div>
       </div>
@@ -141,7 +185,9 @@ export const MyReservations: React.FC<MyReservationsProps> = ({
             <Inbox className="w-12 h-12 text-slate-400 mx-auto mb-3" />
             <h3 className="text-sm font-semibold text-slate-700">目前尚無借用紀錄</h3>
             <p className="text-xs text-slate-500 mt-1">
-              請前往「設備與教室預約大廳」預約視聽教室、多功能學習教室、合作學習教室、生活科技/創課教室或教學器材。
+              {viewScope === 'mine' 
+                ? '您尚未填報借用申請，可點擊上方切換至「全校即時借用登記」查看其他同仁之登記，或前往「設備與教室預約大廳」提出借用申請。'
+                : '請前往「設備與教室預約大廳」預約視聽教室、多功能學習教室、合作學習教室、生活科技/創課教室或教學器材。'}
             </p>
           </div>
         ) : (
@@ -149,8 +195,10 @@ export const MyReservations: React.FC<MyReservationsProps> = ({
             const statusInfo = getStatusDisplay(res.status);
             const isExpanded = expandedLogId === res.id;
             const daysLeft = daysBetween(todayStr, res.expectedReturnDate);
-            const canExtend = res.status === 'borrowed' || res.status === 'approved';
-            const canCancel = res.status === 'pending_section' || res.status === 'section_approved';
+            const isMyRecord = res.applicantId === currentUser.id;
+            const isManager = currentUser.role === 'section_officer' || currentUser.role === 'academic_director';
+            const canExtend = isMyRecord && (res.status === 'borrowed' || res.status === 'approved');
+            const canCancel = (isMyRecord || isManager) && (res.status === 'pending_section' || res.status === 'section_approved');
 
             return (
               <div
@@ -160,14 +208,25 @@ export const MyReservations: React.FC<MyReservationsProps> = ({
               >
                 {/* 第一行：單號、申請人、狀態 */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                     <span className="font-mono font-bold text-xs bg-slate-100 text-sky-700 px-2.5 py-1 rounded-lg border border-slate-200">
                       {res.trackingNumber}
                     </span>
                     <span className="text-xs text-slate-600">
                       申請人：<strong className="text-slate-800">{res.applicantName}</strong> ({res.applicantDepartment})
                     </span>
-                    <span className="text-[11px] text-slate-400 hidden md:inline">
+                    {isMyRecord ? (
+                      <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-300 text-[10px] font-semibold flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                        您填報的案件
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-medium flex items-center gap-1">
+                        <Globe className="w-3 h-3 text-sky-600" />
+                        全校即時連動
+                      </span>
+                    )}
+                    <span className="text-[11px] text-slate-400 hidden lg:inline">
                       送單時間：{res.submittedAt}
                     </span>
                   </div>
@@ -310,6 +369,12 @@ export const MyReservations: React.FC<MyReservationsProps> = ({
                         <FileText className="w-3.5 h-3.5" />
                         申請特殊原因延長
                       </button>
+                    )}
+
+                    {!isMyRecord && !isManager && (
+                      <span className="text-[11px] text-slate-400 italic hidden sm:inline mr-1">
+                        【檢視模式 · 異動/延長僅限填報人】
+                      </span>
                     )}
 
                     {/* 列印憑條 */}

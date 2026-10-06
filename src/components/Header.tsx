@@ -32,6 +32,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
   const { 
     currentUser, 
     setCurrentUser, 
+    reservations,
     notifications, 
     markNotificationRead, 
     clearAllNotifications,
@@ -389,7 +390,10 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
             }`}
           >
             <Inbox className="w-4 h-4" />
-            我的借用申請紀錄
+            全校借用登記與進度追蹤
+            <span className="ml-1 px-1.5 py-0.2 text-[10px] bg-sky-500/30 text-sky-200 rounded-full font-mono">
+              {reservations.length}
+            </span>
           </button>
 
           {/* 教務處招設組專屬頁籤 */}

@@ -449,10 +449,10 @@ export const LOCKED_CLASSROOM_IDS = [
 ];
 
 export const LOCKED_ROOM_IMAGES: Record<string, string> = {
-  'res-av-room': '/1.jpg',
-  'res-coop-room': '/合作.jpg',
-  'res-multi-room': '/543374.jpg',
-  'res-living-tech-room': '/創課.jpg'
+  'res-av-room': '/classroom_av_room_official.jpg',
+  'res-coop-room': '/classroom_coop_room_official.jpg',
+  'res-multi-room': '/classroom_multi_room_official.jpg',
+  'res-living-tech-room': '/classroom_living_tech_official.jpg'
 };
 
 export const INITIAL_RESOURCES: ResourceItem[] = [

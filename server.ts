@@ -10,10 +10,14 @@ const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 const DATA_DIR = path.resolve(__dirname, 'data');
 const DB_FILE = path.join(DATA_DIR, 'school_reservations_db.json');
+const UPLOADS_DIR = path.resolve(__dirname, 'public', 'uploads');
 
-// 確保資料庫目錄存在
+// 確保資料庫與上傳檔案目錄存在
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
 
 interface ServerDatabase {
@@ -25,11 +29,20 @@ interface ServerDatabase {
   customLogo: string | null;
 }
 
+const SEED_FILE = path.join(DATA_DIR, 'initial_seed.json');
+
 // 預設資料庫讀取或初始化
 function loadDatabase(): ServerDatabase {
   try {
     if (fs.existsSync(DB_FILE)) {
       const content = fs.readFileSync(DB_FILE, 'utf-8');
+      const parsed = JSON.parse(content);
+      if (parsed && Array.isArray(parsed.resources) && parsed.resources.length > 0 && Array.isArray(parsed.reservations)) {
+        return parsed;
+      }
+    }
+    if (fs.existsSync(SEED_FILE)) {
+      const content = fs.readFileSync(SEED_FILE, 'utf-8');
       const parsed = JSON.parse(content);
       if (parsed && Array.isArray(parsed.resources) && Array.isArray(parsed.reservations)) {
         return parsed;
@@ -67,6 +80,9 @@ const app = express();
 // 支援大圖檔 base64 上傳（如教室實景照片、校徽）
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// 靜態檔案路由：實景照片與自訂校徽目錄
+app.use('/uploads', express.static(UPLOADS_DIR));
 
 // SSE 連線客戶端集合，支援跨電腦全校即時推播
 const sseClients = new Set<express.Response>();
@@ -280,11 +296,45 @@ app.post('/api/resources/:id/photo', (req, res) => {
       return res.status(404).json({ success: false, error: '找不到該資源項目' });
     }
 
+    let finalImageUrl = imageUrl || db.resources[idx].imageUrl;
+
+    // 若上傳為 Base64 格式，轉存為實體檔案於 /public/uploads/，確保跨裝置與多次登入永久不失效
+    if (imageUrl && imageUrl.startsWith('data:image/')) {
+      try {
+        const matches = imageUrl.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
+        if (matches && matches.length === 3) {
+          const rawExt = matches[1].toLowerCase();
+          const ext = rawExt === 'jpeg' ? 'jpg' : (rawExt === 'png' ? 'png' : (rawExt === 'webp' ? 'webp' : 'jpg'));
+          const base64Data = matches[2];
+          const buffer = Buffer.from(base64Data, 'base64');
+          const fileName = `${id}_locked_${Date.now()}.${ext}`;
+
+          if (!fs.existsSync(UPLOADS_DIR)) {
+            fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+          }
+          fs.writeFileSync(path.join(UPLOADS_DIR, fileName), buffer);
+
+          // 若存在 dist/uploads 亦同步一份
+          const distUploads = path.resolve(__dirname, 'dist', 'uploads');
+          if (fs.existsSync(path.resolve(__dirname, 'dist'))) {
+            if (!fs.existsSync(distUploads)) {
+              fs.mkdirSync(distUploads, { recursive: true });
+            }
+            fs.writeFileSync(path.join(distUploads, fileName), buffer);
+          }
+
+          finalImageUrl = `/uploads/${fileName}`;
+        }
+      } catch (fileErr) {
+        console.error('Failed to write image file, fallback to data url:', fileErr);
+      }
+    }
+
     db.resources[idx] = {
       ...db.resources[idx],
-      imageUrl: imageUrl || db.resources[idx].imageUrl,
+      imageUrl: finalImageUrl,
       isPhotoLocked: isPhotoLocked !== undefined ? isPhotoLocked : true,
-      photoLockedBy: photoLockedBy || '校內官方核定',
+      photoLockedBy: photoLockedBy || '教務處招設組 / 教務主任',
       photoLockedAt: new Date().toLocaleString('zh-TW', { hour12: false })
     };
 
@@ -302,12 +352,30 @@ app.post('/api/resources/:id/photo', (req, res) => {
 app.post('/api/logo', (req, res) => {
   try {
     const { logo } = req.body;
-    db.customLogo = logo;
+    let finalLogo = logo;
+    if (logo && logo.startsWith('data:image/')) {
+      try {
+        const matches = logo.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
+        if (matches && matches.length === 3) {
+          const ext = matches[1].toLowerCase() === 'png' ? 'png' : 'jpg';
+          const buffer = Buffer.from(matches[2], 'base64');
+          const fileName = `custom_logo_${Date.now()}.${ext}`;
+          if (!fs.existsSync(UPLOADS_DIR)) {
+            fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+          }
+          fs.writeFileSync(path.join(UPLOADS_DIR, fileName), buffer);
+          finalLogo = `/uploads/${fileName}`;
+        }
+      } catch (err) {
+        // fallback
+      }
+    }
+    db.customLogo = finalLogo;
     db.version += 1;
     saveDatabase();
-    broadcast('logo_updated', { customLogo: logo, db });
+    broadcast('logo_updated', { customLogo: finalLogo, db });
 
-    res.json({ success: true, version: db.version, customLogo: logo, data: db });
+    res.json({ success: true, version: db.version, customLogo: finalLogo, data: db });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }
