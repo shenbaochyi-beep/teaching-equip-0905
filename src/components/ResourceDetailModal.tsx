@@ -266,21 +266,23 @@ export const ResourceDetailModal: React.FC<ResourceDetailModalProps> = ({
             </p>
           </div>
 
-          {/* 規格配置清單 */}
-          <div className="bg-slate-950/50 rounded-xl p-4 border border-slate-800">
-            <h4 className="text-xs font-bold text-sky-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4" />
-              硬體配備與功能清單
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {resource.specs.map((spec, idx) => (
-                <div key={idx} className="flex items-center gap-2 text-xs text-slate-300">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span>{spec}</span>
-                </div>
-              ))}
+          {/* 主要配置與規格清單 (若有內容才呈現) */}
+          {resource.specs && resource.specs.length > 0 && (
+            <div className="bg-slate-950/50 rounded-xl p-4 border border-slate-800">
+              <h4 className="text-xs font-bold text-sky-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4" />
+                主要配置與規格
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {resource.specs.map((spec, idx) => (
+                  <div key={idx} className="flex items-center gap-2 text-xs text-slate-300">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span>{spec}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* 使用注意事項 */}
           <div className="bg-amber-950/40 border border-amber-800/50 rounded-xl p-4 text-xs text-amber-200 flex items-start gap-3">

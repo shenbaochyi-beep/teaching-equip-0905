@@ -104,7 +104,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
         const matchCode = item.code.toLowerCase().includes(term);
         const matchLoc = item.location.toLowerCase().includes(term);
         const matchDesc = item.description.toLowerCase().includes(term);
-        const matchSpecs = item.specs.some(s => s.toLowerCase().includes(term));
+        const matchSpecs = item.specs?.some(s => s.toLowerCase().includes(term)) ?? false;
         return matchName || matchCode || matchLoc || matchDesc || matchSpecs;
       }
       return true;
@@ -321,22 +321,24 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                     {resource.description}
                   </p>
 
-                  {/* 關鍵配備 Tags */}
-                  <div className="space-y-1">
-                    <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">主要配置與規格：</div>
-                    <div className="flex flex-wrap gap-1">
-                      {resource.specs.slice(0, 3).map((spec, i) => (
-                        <span key={i} className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200 truncate max-w-[200px]">
-                          {spec}
-                        </span>
-                      ))}
-                      {resource.specs.length > 3 && (
-                        <span className="text-[10px] text-slate-500 px-1 py-0.5">
-                          +{resource.specs.length - 3}項
-                        </span>
-                      )}
+                  {/* 關鍵配備 Tags (若有規格才呈現) */}
+                  {resource.specs && resource.specs.length > 0 && (
+                    <div className="space-y-1">
+                      <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">主要配置與規格：</div>
+                      <div className="flex flex-wrap gap-1">
+                        {resource.specs.slice(0, 3).map((spec, i) => (
+                          <span key={i} className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200 truncate max-w-[200px]">
+                            {spec}
+                          </span>
+                        ))}
+                        {resource.specs.length > 3 && (
+                          <span className="text-[10px] text-slate-500 px-1 py-0.5">
+                            +{resource.specs.length - 3}項
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* 借用提示與歸還說明 */}
                   <div className="bg-slate-50 border border-slate-200 rounded-lg p-2 text-[11px] text-slate-600 flex items-center justify-between">

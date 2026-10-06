@@ -467,13 +467,7 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     availableQuantity: 1,
     status: 'available',
     custodian: '教務處招設組',
-    specs: [
-      '階梯式吸音劇院與多功能書寫板座椅 120席',
-      '4K 劇院級高流明雷射懸吊式投影系統',
-      '數位無線環控鵝頸/手握麥克風 (共4支)',
-      '靜音微風循環扇與高頻護眼 LED 筒燈照明',
-      '專業劇院級環繞音響擴大機與全遮光隔音簾'
-    ],
+    specs: [],
     imageUrl: LOCKED_ROOM_IMAGES['res-av-room'],
     description: '適用於全校性公開授課、專題講座、教學觀摩、視聽教學與大型影音成果發表會。',
     cautionNotes: '使用完畢請落實關閉音響環控主機與投影機散熱電源，嚴禁在室內攜帶含糖飲料與熱食。',
@@ -492,13 +486,7 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     availableQuantity: 1,
     status: 'available',
     custodian: '教務處招設組',
-    specs: [
-      '大型移動式液晶顯示大螢幕 (支援小組獨立無線投影同屏)',
-      '模組化木紋研討長桌與折疊會議椅 (可自由排列分組)',
-      '室內專用直立式電子鋼琴 (支援藝文與多元教學研習)',
-      '大面積採光通風窗戶 (配置遮光百葉簾) 與實木收納矮櫃',
-      '天花板懸吊式高流明投影機、三葉節能吊扇與護眼格柵燈具'
-    ],
+    specs: [],
     imageUrl: LOCKED_ROOM_IMAGES['res-coop-room'],
     description: '專供分組合作學習、PBL問題導向專題研討、學生同儕互評、公開觀議課及跨學科協同教學使用。',
     cautionNotes: '分組桌椅使用完畢請歸位整齊，關閉大螢幕、投影機、冷氣及電燈電源，場地清潔復原。',
@@ -517,13 +505,7 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     availableQuantity: 1,
     status: 'available',
     custodian: '教務處招設組',
-    specs: [
-      '寬敞多功能研討長桌與折疊會議椅 (靈活排列)',
-      '前方大型書寫黑板與多功能投影系統',
-      '兩側實木收納置物櫃與全遮光隔音簾',
-      '室內專用直立式教學鋼琴 (支援藝文與多元研習)',
-      '天花板護眼照明燈具與全室靜音旋轉循環扇'
-    ],
+    specs: [],
     imageUrl: LOCKED_ROOM_IMAGES['res-multi-room'],
     description: '專為跨領域素養導向教學、分組研討、研習會議及多元教學活動設計之寬敞多功能教室。',
     cautionNotes: '使用完畢請將桌椅復原整齊，關閉冷氣、電燈、循環扇與電器設備並將黑板清理乾淨。',
@@ -542,13 +524,7 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
     availableQuantity: 1,
     status: 'available',
     custodian: '教務處招設組',
-    specs: [
-      '86吋 4K 智慧互動觸控液晶大螢幕 (兩側配置磁吸滑動式書寫白板)',
-      '前方兩側高容量深木紋多門收納儲物櫃與教學工具置物櫃',
-      '人體工學藍色學生課椅與實作研討組合式桌椅',
-      '數位桌上型雷射雕刻機與自造創客 (Maker) 實作機具工作站',
-      '天花板懸吊式護眼照明燈具、多葉節能吊扇與壁掛式擴音喇叭'
-    ],
+    specs: [],
     imageUrl: LOCKED_ROOM_IMAGES['res-living-tech-room'],
     description: '提供高中生活科技課程、創客自造專題、科技素養實作、機構結構設計與跨領域 STEAM 創思模型製作。',
     cautionNotes: '操作機具請遵守安全守則；使用完畢請落實關閉觸控大螢幕、電燈、吊扇電源，維護機具與場地清潔復原。',
@@ -558,86 +534,63 @@ export const INITIAL_RESOURCES: ResourceItem[] = [
   },
   {
     id: 'res-laptop-batch',
-    name: '筆記型電腦 (10台)',
+    name: '筆記型電腦 (1台)',
     category: 'it_equipment',
-    code: 'EQ-NB-10',
-    location: '教務處 招設組設備室 (筆電專用充電推車NB-01)',
-    quantity: 10,
-    availableQuantity: 10,
-    status: 'available',
-    custodian: '教務處招設組',
-    specs: [
-      'Intel Core i7 高效能處理器 / 16GB 記憶體 / 512GB 高速 NVMe SSD',
-      '15.6吋 Full HD 護眼霧面防眩光顯示螢幕',
-      '預載 Windows 11 專業版、Office 365 辦公套件與常用教學研習軟體',
-      '全套配置筆記型電腦 10台、原廠電源供應器 10組與防震手提保護包',
-      '配置專用集中管理充電推車與無線光學滑鼠 10組'
-    ],
-    imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=80',
-    description: '提供全校教師公開授課、專題研討、教學競賽、數位素養研習及分組教學外借使用（全批共10台）。',
-    cautionNotes: '借還時請確實清點 10台筆電主機、變壓充電線與滑鼠，歸還前請確保已正常關機。'
-  },
-  {
-    id: 'res-pro-camera',
-    name: '專業攝影機 (1台)',
-    category: 'it_equipment',
-    code: 'EQ-PCAM-01',
-    location: '教務處 招設組設備室 (防潮箱C-02)',
+    code: 'EQ-NB-01',
+    location: '教務主任室',
     quantity: 1,
     availableQuantity: 1,
     status: 'available',
     custodian: '教務處招設組',
-    specs: [
-      '4K 60fps 廣播級超高畫質專業攝影機主機 1台',
-      '大光圈光學防手震變焦鏡頭 (24-70mm 恆定大光圈)',
-      '專業指向性熱靴外接收音麥克風 (含戶外防風毛罩)',
-      '專用油壓平穩阻尼三腳架 1組',
-      '高速 256GB V90 記憶卡 1張、原廠雙長效鋰電池與座充組',
-      '防震防撞專用氣密手提防護箱'
-    ],
+    specs: [],
+    imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=80',
+    description: '提供全校教師公開授課、專題研討、教學競賽、數位素養研習使用（全校共1台）。',
+    cautionNotes: '借還時請確實清點筆電主機、變壓充電線與滑鼠配件，歸還前請確保已正常關機。'
+  },
+  {
+    id: 'res-pro-camera',
+    name: '運動攝影機 (2台)',
+    category: 'it_equipment',
+    code: 'EQ-ACAM-02',
+    location: '教務處 學籍室',
+    quantity: 2,
+    availableQuantity: 2,
+    status: 'available',
+    custodian: '教務處招設組',
+    specs: [],
     imageUrl: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80',
-    description: '專供教師公開觀課影音錄製、教學歷程檔案拍攝、校園重大活動紀錄及微電影專題製作專用（全校共1台）。',
-    cautionNotes: '光學鏡片嚴禁用手觸摸；雨天禁止於室外無遮蔽處使用，歸還前請先備份記憶卡影像檔案。'
+    description: '專供戶外教學活動紀錄、體育運動訓練記錄、校園重要活動與微電影專題製作專用（全校共2台）。',
+    cautionNotes: '鏡頭嚴禁用手觸摸；雨天請裝妥防水防護設備或於安全遮蔽處使用，歸還前請先備份記憶卡影像檔案。'
   },
   {
     id: 'res-doc-cam',
-    name: '專業實務投影機',
+    name: '實務投影機 (1台)',
     category: 'it_equipment',
-    code: 'EQ-DCAM-05',
-    location: '教務處 招設組設備室 (架B-02)',
-    quantity: 5,
-    availableQuantity: 4,
+    code: 'EQ-DCAM-01',
+    location: '教務處 學籍室',
+    quantity: 1,
+    availableQuantity: 1,
     status: 'available',
     custodian: '教務處招設組',
-    specs: [
-      '4K 60fps 高清超細緻鏡頭',
-      '無段式機械懸臂與自動瞬時對焦',
-      'HDMI / USB 雙模輸出 (支援電腦連線拍照/錄影)',
-      '內建三段式護眼 LED 補光燈'
-    ],
+    specs: [],
     imageUrl: 'https://images.unsplash.com/photo-1526738549149-8e07eca6c147?auto=format&fit=crop&w=800&q=80',
-    description: '適用於自然實驗細微步驟展示、美術作品賞析、學生作業即時點評分享。',
-    cautionNotes: '折疊收納時請依照關節指示方向旋轉，切勿強力扭折鵝頸懸臂。'
+    description: '適用於自然實驗細微步驟展示、美術作品賞析、學生作業即時點評分享（全校共1台）。',
+    cautionNotes: '折疊收納時請依照關節指示方向旋轉，切勿強力扭折懸臂結構。'
   },
   {
     id: 'res-wireless-mic',
-    name: '專業可攜式戶外/室內移動音響麥克風組',
+    name: '攜帶式藍芽喇叭 (2台)',
     category: 'av_equipment',
-    code: 'EQ-PA-02',
-    location: '教務處 招設組設備室 (櫃C-01)',
-    quantity: 4,
-    availableQuantity: 3,
+    code: 'EQ-BTSP-02',
+    location: '教務處 放映室',
+    quantity: 2,
+    availableQuantity: 2,
     status: 'available',
     custodian: '教務處招設組',
-    specs: [
-      '150W 強大功率輸出 (清晰涵蓋操場/大禮堂)',
-      '雙 UHF 自動對頻抗干擾無線手握麥克風',
-      '內建大容量鋰電池 (連續使用可達 8 小時)',
-      '支援藍牙 5.0、USB隨身碟與 3.5mm 音源輸入'
-    ],
+    specs: [],
     imageUrl: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=800&q=80',
-    description: '戶外教學、校慶彩排、體育競賽、大型集會及川堂公開宣導專用。',
-    cautionNotes: '使用完畢請務必關閉麥克風電池開關，主機插電充電至指示燈轉綠。'
+    description: '適用於戶外教學、活動廣播、音樂播放及小型聚會使用（全校共2台）。',
+    cautionNotes: '使用完畢請務必關閉電源開關，主機插電充電至指示燈轉綠並妥善收納歸位。'
   }
 ];
 
@@ -756,8 +709,8 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
     id: 'resv-003',
     trackingNumber: 'EDU-20260830-303',
     resourceId: 'res-laptop-batch',
-    resourceName: '筆記型電腦 (10台)',
-    resourceCode: 'EQ-NB-10',
+    resourceName: '筆記型電腦 (1台)',
+    resourceCode: 'EQ-NB-01',
     resourceCategory: 'it_equipment',
     applicantId: 'user-acad-liu',
     applicantName: '劉泄嬉 組長',
@@ -829,7 +782,7 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
         step: 'checkout',
         actorName: '林彥伊 招設組長',
         actorRole: '教務處招設組承辦人',
-        action: '實體設備點交領取確認 (筆記型電腦 10台組與專用充電箱)',
+        action: '實體設備點交領取確認 (筆記型電腦 1台與專用變壓充電線組)',
         timestamp: today + ' 08:00',
         statusChange: '使用中 (已領取)'
       },
@@ -916,7 +869,7 @@ export const INITIAL_NOTIFICATIONS: SystemNotification[] = [
     id: 'notif-3',
     userId: 'user-director-huang',
     title: '待核定借用與延長案',
-    message: '您有 1 筆待核定一般借用案 (多功能學習教室 - 卓銘欣老師) 及 1 筆特殊原因延長借用案 (筆記型電腦組 - 劉泄嬉組長) 待批示。',
+    message: '您有 1 筆待核定一般借用案 (多功能學習教室 - 卓銘欣老師) 及 1 筆特殊原因延長借用案 (筆記型電腦 - 劉泄嬉組長) 待批示。',
     type: 'urgent',
     timestamp: '今天 15:15',
     read: false

@@ -24,6 +24,15 @@ import {
   isValidLoanDuration,
   daysBetween
 } from '../utils/dateUtils';
+import {
+  fetchServerState,
+  sendServerReservation,
+  sendServerReservationUpdate,
+  sendServerResourcePhoto,
+  sendServerLogo,
+  sendServerReset,
+  subscribeServerEvents
+} from '../utils/apiSync';
 
 interface ToastMessage {
   id: string;
@@ -371,6 +380,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         category: initial.category,
         code: initial.code,
         location: initial.location,
+        quantity: initial.quantity,
+        availableQuantity: initial.availableQuantity,
         specs: initial.specs,
         description: initial.description,
         cautionNotes: initial.cautionNotes,
@@ -388,7 +399,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [reservations, setReservations] = useState<Reservation[]>(() => {
     const saved = safeStorage.getItem(STORAGE_KEYS.RESERVATIONS);
     const parsed = safeJsonParse<Reservation[]>(saved, INITIAL_RESERVATIONS);
-    // 若既有預約包含已更替之資源班教室，自動對齊至合作學習教室；若有舊平板推車預約，對齊至筆電
+    // 自動對齊既有預約之設備與場地名稱、財產編號
     const updated = parsed.map(resv => {
       if (resv.resourceId === 'res-resource-room') {
         return {
@@ -399,13 +410,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           resourceCategory: 'cooperative_room' as any
         };
       }
-      if (resv.resourceId === 'res-ipad-cart') {
+      if (resv.resourceId === 'res-ipad-cart' || resv.resourceId === 'res-laptop-batch') {
         return {
           ...resv,
           resourceId: 'res-laptop-batch',
-          resourceName: '筆記型電腦 (10台)',
-          resourceCode: 'EQ-NB-10',
+          resourceName: '筆記型電腦 (1台)',
+          resourceCode: 'EQ-NB-01',
           resourceCategory: 'it_equipment' as any
+        };
+      }
+      if (resv.resourceId === 'res-pro-camera') {
+        return {
+          ...resv,
+          resourceName: '運動攝影機 (2台)',
+          resourceCode: 'EQ-ACAM-02',
+          resourceCategory: 'it_equipment' as any
+        };
+      }
+      if (resv.resourceId === 'res-doc-cam') {
+        return {
+          ...resv,
+          resourceName: '實務投影機 (1台)',
+          resourceCode: 'EQ-DCAM-01',
+          resourceCategory: 'it_equipment' as any
+        };
+      }
+      if (resv.resourceId === 'res-wireless-mic') {
+        return {
+          ...resv,
+          resourceName: '攜帶式藍芽喇叭 (2台)',
+          resourceCode: 'EQ-BTSP-02',
+          resourceCategory: 'av_equipment' as any
         };
       }
       if (resv.resourceId === 'res-multi-room') {
@@ -492,6 +527,62 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     });
   }, [resources]);
+
+  // 跨電腦全校即時連動同步機制 (支援任意電腦經由發布網址即時同步借用與設備資料)
+  useEffect(() => {
+    let isMounted = true;
+
+    // 1. 初始化立即向中央伺服器索取全系統即時資料庫
+    fetchServerState().then(serverState => {
+      if (!isMounted || !serverState) return;
+      if (serverState.resources && serverState.resources.length > 0) setResources(serverState.resources);
+      if (serverState.reservations && serverState.reservations.length > 0) setReservations(serverState.reservations);
+      if (serverState.notifications) setNotifications(serverState.notifications);
+      if (serverState.customLogo !== undefined) setCustomLogo(serverState.customLogo);
+    });
+
+    // 2. 建立即時 Server-Sent Events 連線，任一教職員電腦一送出，所有電腦立即收到推播更新
+    const unsubscribe = subscribeServerEvents(serverState => {
+      if (!isMounted || !serverState) return;
+      if (serverState.resources && serverState.resources.length > 0) setResources(serverState.resources);
+      if (serverState.reservations && serverState.reservations.length > 0) setReservations(serverState.reservations);
+      if (serverState.notifications) setNotifications(serverState.notifications);
+      if (serverState.customLogo !== undefined) setCustomLogo(serverState.customLogo);
+    });
+
+    // 3. 背景週期性輪詢核對 (每 3 秒)，確保即使網路暫態斷線重連亦可無縫接續
+    const pollInterval = setInterval(() => {
+      fetchServerState().then(serverState => {
+        if (!isMounted || !serverState) return;
+        if (serverState.resources && serverState.resources.length > 0) setResources(serverState.resources);
+        if (serverState.reservations && serverState.reservations.length > 0) setReservations(serverState.reservations);
+        if (serverState.notifications) setNotifications(serverState.notifications);
+        if (serverState.customLogo !== undefined) setCustomLogo(serverState.customLogo);
+      });
+    }, 3000);
+
+    const handleFocus = () => {
+      fetchServerState().then(serverState => {
+        if (!isMounted || !serverState) return;
+        if (serverState.resources && serverState.resources.length > 0) setResources(serverState.resources);
+        if (serverState.reservations && serverState.reservations.length > 0) setReservations(serverState.reservations);
+        if (serverState.notifications) setNotifications(serverState.notifications);
+        if (serverState.customLogo !== undefined) setCustomLogo(serverState.customLogo);
+      });
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) handleFocus();
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+      clearInterval(pollInterval);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
 
   // 資安登入驗證處理：需帳號完全符合才能登入
   const loginWithAccount = (
@@ -655,6 +746,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     setReservations(prev => [newReservation, ...prev]);
+    sendServerReservation(newReservation);
 
     // 通知招設組
     const sectionOfficer = INITIAL_USERS.find(u => u.role === 'section_officer');
@@ -674,6 +766,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // 取消申請
   const cancelReservation = (reservationId: string, reason = '申請人主動取消') => {
+    sendServerReservationUpdate(reservationId, { status: 'cancelled' });
     setReservations(prev => prev.map(res => {
       if (res.id !== reservationId) return res;
       const log: ApprovalLog = {
@@ -694,13 +787,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('info', '已取消借用申請', '該筆預約已變更為取消狀態。');
   };
 
-  // 招設組審查
+    // 招設組審查
   const reviewBySection = (reservationId: string, decision: 'approve' | 'reject', note: string) => {
     const nowTimeStr = formatDateTime(new Date());
+    const newStatus: ReservationStatus = decision === 'approve' ? 'section_approved' : 'rejected_section';
+    sendServerReservationUpdate(reservationId, {
+      status: newStatus,
+      sectionReviewer: currentUser.name,
+      sectionNote: note,
+      sectionReviewedAt: nowTimeStr
+    });
+
     setReservations(prev => prev.map(res => {
       if (res.id !== reservationId) return res;
       
-      const newStatus: ReservationStatus = decision === 'approve' ? 'section_approved' : 'rejected_section';
       const log: ApprovalLog = {
         id: 'log-' + Date.now(),
         step: 'section_review',
@@ -754,10 +854,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // 教務主任核定
   const reviewByDirector = (reservationId: string, decision: 'approve' | 'reject', note: string) => {
     const nowTimeStr = formatDateTime(new Date());
+    const newStatus: ReservationStatus = decision === 'approve' ? 'approved' : 'rejected_director';
+    sendServerReservationUpdate(reservationId, {
+      status: newStatus,
+      directorReviewer: currentUser.name,
+      directorNote: note,
+      directorReviewedAt: nowTimeStr
+    });
+
     setReservations(prev => prev.map(res => {
       if (res.id !== reservationId) return res;
       
-      const newStatus: ReservationStatus = decision === 'approve' ? 'approved' : 'rejected_director';
       const log: ApprovalLog = {
         id: 'log-' + Date.now(),
         step: 'director_approval',
@@ -800,6 +907,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // 實體設備借出 (招設組點交)
   const checkoutReservation = (reservationId: string, notes = '設備與配件已於櫃檯清點無誤點交') => {
     const nowTimeStr = formatDateTime(new Date());
+    sendServerReservationUpdate(reservationId, {
+      status: 'borrowed',
+      checkoutOfficer: currentUser.name,
+      checkoutAt: nowTimeStr
+    });
+
     setReservations(prev => prev.map(res => {
       if (res.id !== reservationId) return res;
       const log: ApprovalLog = {
@@ -836,6 +949,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // 設備歸還點收
   const checkinReservation = (reservationId: string, conditionNote: string) => {
     const nowTimeStr = formatDateTime(new Date());
+    sendServerReservationUpdate(reservationId, {
+      status: 'returned',
+      actualReturnDate: nowTimeStr,
+      checkinOfficer: currentUser.name,
+      checkinAt: nowTimeStr,
+      checkinConditionNote: conditionNote || '設備功能完好，場地復原良好。'
+    });
+
     setReservations(prev => prev.map(res => {
       if (res.id !== reservationId) return res;
       const log: ApprovalLog = {
@@ -888,6 +1009,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const nowTimeStr = formatDateTime(new Date());
     const extId = 'ext-' + Date.now();
 
+    const newExt = {
+      id: extId,
+      originalReturnDate: target.expectedReturnDate,
+      requestedReturnDate: newReturnDate,
+      daysExtended: daysExt,
+      reason,
+      submittedAt: nowTimeStr,
+      sectionStatus: 'pending' as const,
+      directorStatus: 'pending' as const
+    };
+
+    sendServerReservationUpdate(reservationId, {
+      status: 'extension_pending',
+      extension: newExt
+    });
+
     const log: ApprovalLog = {
       id: 'log-' + Date.now(),
       step: 'extension_submission',
@@ -904,16 +1041,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return {
         ...res,
         status: 'extension_pending',
-        extension: {
-          id: extId,
-          originalReturnDate: res.expectedReturnDate,
-          requestedReturnDate: newReturnDate,
-          daysExtended: daysExt,
-          reason,
-          submittedAt: nowTimeStr,
-          sectionStatus: 'pending',
-          directorStatus: 'pending'
-        },
+        extension: newExt,
         approvalLogs: [...res.approvalLogs, log]
       };
     }));
@@ -937,6 +1065,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // 招設組審查延長借用
   const reviewExtensionBySection = (reservationId: string, decision: 'approve' | 'reject', note: string) => {
     const nowTimeStr = formatDateTime(new Date());
+    const target = reservations.find(r => r.id === reservationId);
+    if (target?.extension) {
+      sendServerReservationUpdate(reservationId, {
+        extension: {
+          ...target.extension,
+          sectionStatus: decision === 'approve' ? ('approved' as const) : ('rejected' as const),
+          sectionNote: note,
+          sectionReviewer: currentUser.name,
+          sectionReviewedAt: nowTimeStr
+        }
+      });
+    }
+
     setReservations(prev => prev.map(res => {
       if (res.id !== reservationId || !res.extension) return res;
 
@@ -989,10 +1130,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // 教務主任核定延長借用
   const reviewExtensionByDirector = (reservationId: string, decision: 'approve' | 'reject', note: string) => {
     const nowTimeStr = formatDateTime(new Date());
+    const target = reservations.find(r => r.id === reservationId);
+    const approved = decision === 'approve';
+    if (target?.extension) {
+      const finalReturnDate = approved ? target.extension.requestedReturnDate : target.expectedReturnDate;
+      sendServerReservationUpdate(reservationId, {
+        status: 'borrowed',
+        expectedReturnDate: finalReturnDate,
+        extension: {
+          ...target.extension,
+          directorStatus: approved ? ('approved' as const) : ('rejected' as const),
+          directorNote: note,
+          directorReviewer: currentUser.name,
+          directorReviewedAt: nowTimeStr
+        }
+      });
+    }
+
     setReservations(prev => prev.map(res => {
       if (res.id !== reservationId || !res.extension) return res;
 
-      const approved = decision === 'approve';
       const updatedExt = {
         ...res.extension,
         directorStatus: approved ? ('approved' as const) : ('rejected' as const),
@@ -1070,6 +1227,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       lockedAt
     }));
 
+    sendServerResourcePhoto(resourceId, {
+      imageUrl: newImageUrl,
+      photoLockedBy: lockedBy,
+      isPhotoLocked: true
+    });
+
     setResources(prev => {
       const updated = prev.map(r => r.id === resourceId ? { 
         ...r, 
@@ -1102,6 +1265,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       showToast('error', '權限受限', '系統校徽已固定鎖定，僅限【教務主任】登入後方可更換！');
       return;
     }
+    sendServerLogo(newLogo);
     setCustomLogo(newLogo);
   };
 
@@ -1136,6 +1300,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     safeStorage.setItem(STORAGE_KEYS.RESOURCES, JSON.stringify(finalResetResources));
     setReservations(INITIAL_RESERVATIONS);
     setNotifications(INITIAL_NOTIFICATIONS);
+    sendServerReset(INITIAL_RESERVATIONS, INITIAL_NOTIFICATIONS);
     showToast('info', '系統資料已還原', '已重設為標準展示範例資料（所有已上傳鎖定之照片與校徽維持固定鎖定）。');
   };
 

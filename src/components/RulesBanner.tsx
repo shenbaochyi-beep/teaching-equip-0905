@@ -38,7 +38,7 @@ export const RulesBanner: React.FC = () => {
             設備/教室借用規定重點提醒
           </h2>
           <p className="text-xs sm:text-sm text-blue-100/90 mt-1 max-w-3xl leading-relaxed">
-            借用設備一律為學校教職員；請先查詢設備或教室閒置狀態，<strong>須於借用日30日前先行登記</strong>，借用後<strong>須於3日內歸還</strong>。如有特殊教學需求延長，請填具「特殊原因延長借用申請」，經教務處招設組審查、教務主任核定。
+            借用設備與教室 一律為學校教職員；請先查詢設備或教室閒置狀態， <strong>須於借用日 1 日前先行登記</strong>，借用後<strong>須於 3 日內歸還</strong>。如有特殊教學需求延長，請填具「特殊原因延長借用申請」，經 <strong>教務處 計畫人員 確認 第一層 專科教室鑰匙保管者</strong> 、 <strong>招設組審查 第二層</strong> 、<strong>教務主任核定 第三層</strong> 。
           </p>
         </div>
 
@@ -60,9 +60,9 @@ export const RulesBanner: React.FC = () => {
           </div>
           <div>
             <div className="text-xs font-bold text-sky-300">借用身分限定</div>
-            <div className="text-xs text-slate-200 mt-0.5 font-medium">全體專兼任教職員</div>
+            <div className="text-xs text-slate-200 mt-0.5 font-medium">一律為學校教職員</div>
             <div className="text-[11px] text-slate-400 mt-1 leading-snug">
-              限本校教學、課程觀課、科展培訓及公開研討活動使用。
+              借用設備與教室一律為學校教職員；請先查詢設備或教室閒置狀態。
             </div>
           </div>
         </div>
@@ -73,12 +73,12 @@ export const RulesBanner: React.FC = () => {
             <CalendarClock className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-xs font-bold text-amber-300">提前 30 日登記預約</div>
+            <div className="text-xs font-bold text-amber-300">提前 1 日先行登記</div>
             <div className="text-xs text-slate-200 mt-0.5 font-medium">
-              最早可借日：<span className="text-amber-300 font-bold">{earliestDateStr}</span>
+              須於借用日 1 日前登記
             </div>
             <div className="text-[11px] text-slate-400 mt-1 leading-snug">
-              系統嚴格防呆，借用前須預留 30 日供招設組調配檢測與簽核。
+              請先查詢設備或教室閒置狀態，須於借用日 1 日前先行登記辦理。
             </div>
           </div>
         </div>
@@ -89,10 +89,10 @@ export const RulesBanner: React.FC = () => {
             <RotateCcw className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-xs font-bold text-emerald-300">借用期限 3 日內歸還</div>
-            <div className="text-xs text-slate-200 mt-0.5 font-medium">借期上限 3 天</div>
+            <div className="text-xs font-bold text-emerald-300">借用後 3 日內歸還</div>
+            <div className="text-xs text-slate-200 mt-0.5 font-medium">須於 3 日內歸還</div>
             <div className="text-[11px] text-slate-400 mt-1 leading-snug">
-              借用後須於3日內點收歸還，確保各班級與教師資源流通。
+              借用後須於 3 日內點收歸還，以落實教學設備良好循環流通。
             </div>
           </div>
         </div>
@@ -103,10 +103,10 @@ export const RulesBanner: React.FC = () => {
             <FileText className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-xs font-bold text-purple-300">特殊延長另案申請</div>
-            <div className="text-xs text-slate-200 mt-0.5 font-medium">招設組初審 ➔ 主任核定</div>
+            <div className="text-xs font-bold text-purple-300">特殊需求延長三層簽核</div>
+            <div className="text-xs text-slate-200 mt-0.5 font-medium">第一層 ➔ 第二層 ➔ 第三層</div>
             <div className="text-[11px] text-slate-400 mt-1 leading-snug">
-              如因科展、大型專案需延長借期，可於借用中提出線上延長申請。
+              教務處計畫人員確認（第一層）➔ 招設組審查（第二層）➔ 教務主任核定（第三層）。
             </div>
           </div>
         </div>
@@ -117,33 +117,33 @@ export const RulesBanner: React.FC = () => {
         <div className="mt-4 pt-4 border-t border-blue-800/60 text-xs bg-slate-950/40 -mx-5 -mb-5 p-5 rounded-b-2xl">
           <h3 className="font-bold text-sky-200 text-sm mb-2 flex items-center gap-1.5">
             <CheckCircle2 className="w-4 h-4 text-sky-400" />
-            教務處教學設備借用標準行政作業流程（SOP）
+            教務處教學設備與教室借用標準行政作業流程（SOP）
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-3 relative">
             <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-700">
-              <span className="text-[10px] text-sky-400 font-bold uppercase">步驟 1</span>
-              <div className="font-semibold text-slate-200 mt-1">線上查詢與預約登記</div>
-              <p className="text-[11px] text-slate-400 mt-1">教職員於借用日30日前查詢閒置狀態並填寫借用單。</p>
+              <span className="text-[10px] text-sky-400 font-bold uppercase">預約登記</span>
+              <div className="font-semibold text-slate-200 mt-1">查詢閒置與先行登記</div>
+              <p className="text-[11px] text-slate-400 mt-1">借用設備與教室一律為學校教職員；先查詢閒置狀態，須於借用日1日前先行登記。</p>
             </div>
             <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-700">
-              <span className="text-[10px] text-sky-400 font-bold uppercase">步驟 2</span>
+              <span className="text-[10px] text-sky-400 font-bold uppercase">第一層確認</span>
+              <div className="font-semibold text-slate-200 mt-1">專科教室鑰匙保管者</div>
+              <p className="text-[11px] text-slate-400 mt-1">由教務處計畫人員確認（第一層 專科教室鑰匙保管者）。</p>
+            </div>
+            <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-700">
+              <span className="text-[10px] text-purple-400 font-bold uppercase">第二層審查</span>
               <div className="font-semibold text-slate-200 mt-1">招設組業務審查</div>
-              <p className="text-[11px] text-slate-400 mt-1">設備組查核無時段衝突、設備妥善率並初審核章。</p>
+              <p className="text-[11px] text-slate-400 mt-1">由招設組進行設備妥善調度、時段衝突查核與第二層初審。</p>
             </div>
             <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-700">
-              <span className="text-[10px] text-purple-400 font-bold uppercase">步驟 3</span>
+              <span className="text-[10px] text-emerald-400 font-bold uppercase">第三層核定</span>
               <div className="font-semibold text-slate-200 mt-1">教務主任核定</div>
-              <p className="text-[11px] text-slate-400 mt-1">由教務主任進行最終審批核准（含核定意見簽章）。</p>
+              <p className="text-[11px] text-slate-400 mt-1">由教務主任進行第三層最終裁定核可與意見批示。</p>
             </div>
             <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-700">
-              <span className="text-[10px] text-emerald-400 font-bold uppercase">步驟 4</span>
-              <div className="font-semibold text-slate-200 mt-1">實體點交借出</div>
-              <p className="text-[11px] text-slate-400 mt-1">申請人憑借用核定通知至設備室領取物品/教室鑰匙。</p>
-            </div>
-            <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-700">
-              <span className="text-[10px] text-amber-400 font-bold uppercase">步驟 5</span>
-              <div className="font-semibold text-slate-200 mt-1">3日內驗收歸還</div>
-              <p className="text-[11px] text-slate-400 mt-1">使用完畢復原並於3日內歸還點收結案（或另案申請延長）。</p>
+              <span className="text-[10px] text-amber-400 font-bold uppercase">出借與歸還</span>
+              <div className="font-semibold text-slate-200 mt-1">借用後3日內歸還</div>
+              <p className="text-[11px] text-slate-400 mt-1">借用後須於3日內歸還。如有特殊教學需求延長，請填具「特殊原因延長借用申請」。</p>
             </div>
           </div>
         </div>
