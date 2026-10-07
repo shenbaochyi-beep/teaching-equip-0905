@@ -146,49 +146,64 @@ export const PrintSlipModal: React.FC<PrintSlipModalProps> = ({
             </table>
           </div>
 
-          {/* 審核簽章欄位 */}
-          <div className="grid grid-cols-3 gap-4 text-xs pt-2">
-            {/* 招設組業務審查 */}
-            <div className="border border-slate-300 rounded-lg p-3 bg-slate-50 relative">
+          {/* 審核簽章欄位 (三層行政機制 + 領用點收) */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs pt-2">
+            {/* 第一層：教務處計畫人員初審做確認 (專科教室鑰匙保管者) */}
+            <div className="border border-slate-300 rounded-lg p-2.5 bg-slate-50 relative">
               <div className="font-bold text-slate-700 border-b border-slate-200 pb-1 flex items-center justify-between">
-                <span>1. 教務處招設組審查</span>
-                <span className="text-[10px] text-sky-700 font-semibold">初審核章</span>
+                <span>1. 計畫人員初審確認</span>
+                <span className="text-[10px] text-teal-700 font-semibold">第一層核章</span>
               </div>
-              <div className="mt-2 text-[11px] text-slate-600 min-h-[50px]">
-                {reservation.sectionNote || '已查核設備完好無衝突，同意出借。'}
+              <div className="mt-2 text-[11px] text-slate-600 min-h-[46px]">
+                {reservation.projectStaffNote || '鑰匙保管查核無誤，設備時段閒置，初審確認無誤。'}
               </div>
-              <div className="mt-2 pt-2 border-t border-dashed border-slate-300 flex items-center justify-between text-[11px]">
+              <div className="mt-2 pt-1.5 border-t border-dashed border-slate-300 flex items-center justify-between text-[11px]">
+                <span>初審人：</span>
+                <span className="font-bold text-slate-900">{reservation.projectStaffReviewer || '教務處計畫人員'}</span>
+              </div>
+            </div>
+
+            {/* 第二層：招設組業務複審 */}
+            <div className="border border-slate-300 rounded-lg p-2.5 bg-slate-50 relative">
+              <div className="font-bold text-slate-700 border-b border-slate-200 pb-1 flex items-center justify-between">
+                <span>2. 招設組業務複審</span>
+                <span className="text-[10px] text-sky-700 font-semibold">第二層複審</span>
+              </div>
+              <div className="mt-2 text-[11px] text-slate-600 min-h-[46px]">
+                {reservation.sectionNote || '已查核設備完好無衝突，第二層複審通過。'}
+              </div>
+              <div className="mt-2 pt-1.5 border-t border-dashed border-slate-300 flex items-center justify-between text-[11px]">
                 <span>承辦人：</span>
                 <span className="font-bold text-slate-900">{reservation.sectionReviewer || '林彥伊 招設組長'}</span>
               </div>
             </div>
 
-            {/* 教務主任核定 */}
-            <div className="border border-slate-300 rounded-lg p-3 bg-slate-50 relative">
+            {/* 第三層：教務主任主管核定 */}
+            <div className="border border-slate-300 rounded-lg p-2.5 bg-slate-50 relative">
               <div className="font-bold text-slate-700 border-b border-slate-200 pb-1 flex items-center justify-between">
-                <span>2. 教務主任核定</span>
-                <span className="text-[10px] text-purple-700 font-semibold">主管決行</span>
+                <span>3. 教務主任核定</span>
+                <span className="text-[10px] text-purple-700 font-semibold">第三層決行</span>
               </div>
-              <div className="mt-2 text-[11px] text-slate-600 min-h-[50px]">
-                {reservation.directorNote || '核定准予借用，請注意用電安全及環境整潔。'}
+              <div className="mt-2 text-[11px] text-slate-600 min-h-[46px]">
+                {reservation.directorNote || '核定准予借用，請注意保管安全與整潔。'}
               </div>
-              <div className="mt-2 pt-2 border-t border-dashed border-slate-300 flex items-center justify-between text-[11px]">
+              <div className="mt-2 pt-1.5 border-t border-dashed border-slate-300 flex items-center justify-between text-[11px]">
                 <span>教務主任：</span>
                 <span className="font-bold text-slate-900">{reservation.directorReviewer || '黃寀霓 主任'}</span>
               </div>
             </div>
 
             {/* 借用人簽名及歸還簽收 */}
-            <div className="border border-slate-300 rounded-lg p-3 bg-slate-50">
+            <div className="border border-slate-300 rounded-lg p-2.5 bg-slate-50">
               <div className="font-bold text-slate-700 border-b border-slate-200 pb-1 flex items-center justify-between">
-                <span>3. 領用/歸還點收</span>
+                <span>4. 領用與歸還點收</span>
                 <span className="text-[10px] text-emerald-700 font-semibold">實體點檢</span>
               </div>
-              <div className="mt-2 text-[11px] text-slate-600 space-y-1">
-                <div>借出點交：{reservation.checkoutAt ? `${reservation.checkoutAt} (已點交)` : '待領取點交'}</div>
-                <div>歸還點收：{reservation.actualReturnDate ? `${reservation.actualReturnDate} (已結案)` : '待歸還驗收'}</div>
+              <div className="mt-2 text-[11px] text-slate-600 space-y-0.5 min-h-[46px]">
+                <div>借出：{reservation.checkoutAt ? `${reservation.checkoutAt}` : '待領取點交'}</div>
+                <div>歸還：{reservation.actualReturnDate ? `${reservation.actualReturnDate}` : '待歸還驗收'}</div>
               </div>
-              <div className="mt-2 pt-2 border-t border-dashed border-slate-300 flex items-center justify-between text-[11px]">
+              <div className="mt-2 pt-1.5 border-t border-dashed border-slate-300 flex items-center justify-between text-[11px]">
                 <span>借用人簽章：</span>
                 <span className="font-bold text-slate-900">{reservation.applicantName}</span>
               </div>
@@ -197,10 +212,10 @@ export const PrintSlipModal: React.FC<PrintSlipModalProps> = ({
 
           {/* 備註與注意事項 */}
           <div className="bg-slate-100 p-3 rounded-lg text-[11px] text-slate-600 space-y-1">
-            <div className="font-bold text-slate-800">教學設備與教室借用規範須知：</div>
-            <div>1. 借用設備與教室一律為本校教職員工，借用前須於借用日 30 日前先行登記。</div>
-            <div>2. 借用後須於 3 日內點收歸還。如有特殊教學或競賽專案需延長，須填具特殊延長借用申請書，經招設組審查及教務主任核定。</div>
-            <div>3. 物品領取時請會同招設組同仁當面清點配件；歸還時若有遺失或人為損壞應負修復賠償責任。</div>
+            <div className="font-bold text-slate-800">設備/教室借用規定重點提醒：</div>
+            <div>1. 借用設備與教室 一律為學校教職員；請先查詢設備或教室閒置狀態， 須於借用日 1 日前先行登記，借用後須於 3 日內歸還。</div>
+            <div>2. 如有特殊教學需求延長，請填具「特殊原因延長借用申請」，經 教務處 計畫人員 確認 第一層 專科教室鑰匙保管者 、 招設組審查 第二層 、教務主任核定 第三層 。</div>
+            <div>3. 物品領取時請會同承辦人員當面清點配件；使用完畢落實場地復原及設備歸還驗收。</div>
           </div>
 
         </div>

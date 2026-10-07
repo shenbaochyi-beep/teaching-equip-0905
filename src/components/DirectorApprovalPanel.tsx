@@ -13,7 +13,8 @@ import {
   ShieldCheck, 
   ArrowRight,
   MessageSquare,
-  Award
+  Award,
+  KeyRound
 } from 'lucide-react';
 import { daysBetween } from '../utils/dateUtils';
 
@@ -123,13 +124,20 @@ export const DirectorApprovalPanel: React.FC = () => {
                     <span className="text-sm font-bold text-slate-900">{res.resourceName}</span>
                     <span className="text-slate-500">申請人：<strong className="text-slate-800">{res.applicantName}</strong> ({res.applicantDepartment})</span>
                   </div>
-                  <span className="text-emerald-800 font-semibold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                    ✓ 招設組已初審核章
-                  </span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-teal-800 font-semibold bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200 text-xs flex items-center gap-1">
+                      <KeyRound className="w-3 h-3 text-teal-600" />
+                      1. 計畫人員初審已確認
+                    </span>
+                    <span className="text-emerald-800 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 text-xs flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                      2. 招設組複審通過
+                    </span>
+                  </div>
                 </div>
 
                 {/* 借用要項 */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
                   <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
                     <span className="text-slate-500 block mb-1">借用時段與天數：</span>
                     <div className="font-semibold text-slate-900">{res.startDate} ({res.startTime}) 至 {res.expectedReturnDate} ({res.expectedReturnTime})</div>
@@ -142,13 +150,24 @@ export const DirectorApprovalPanel: React.FC = () => {
                     <div className="text-[11px] text-slate-500 mt-1">班級：{res.targetClass || '校內教學'} (約 {res.estimatedAttendees || 30} 人)</div>
                   </div>
 
-                  <div className="bg-sky-50 p-3 rounded-xl border border-sky-200">
+                  {/* 第一層 計畫人員意見 */}
+                  <div className="bg-teal-50/70 p-3 rounded-xl border border-teal-200">
+                    <span className="text-teal-900 font-semibold block mb-1 flex items-center gap-1">
+                      <KeyRound className="w-3.5 h-3.5 text-teal-600" />
+                      第一層 計畫人員初審：
+                    </span>
+                    <div className="text-slate-800 text-xs">{res.projectStaffNote || '鑰匙保管備存無衝突，初審確認通過。'}</div>
+                    <div className="text-[10px] text-teal-700 mt-1">承辦人：{res.projectStaffReviewer || '教務處計畫人員 (slvs280)'}</div>
+                  </div>
+
+                  {/* 第二層 招設組複審意見 */}
+                  <div className="bg-sky-50/70 p-3 rounded-xl border border-sky-200">
                     <span className="text-sky-900 font-semibold block mb-1 flex items-center gap-1">
                       <ShieldCheck className="w-3.5 h-3.5 text-sky-600" />
-                      招設組初審意見：
+                      第二層 招設組複審：
                     </span>
-                    <div className="text-slate-800 text-xs">{res.sectionNote || '設備功能正常，庫存充足，時段無衝突，建請准予借用。'}</div>
-                    <div className="text-[10px] text-slate-500 mt-1">初審承辦人：{res.sectionReviewer}</div>
+                    <div className="text-slate-800 text-xs">{res.sectionNote || '設備功能正常，庫存充足，時段無衝突，複審通過呈請主任核定。'}</div>
+                    <div className="text-[10px] text-slate-500 mt-1">複審承辦人：{res.sectionReviewer || '林彥伊 招設組長'}</div>
                   </div>
                 </div>
 

@@ -156,7 +156,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                 借用登記申請單
               </h3>
               <p className="text-xs text-slate-300">
-                教務處招設組業務審查 ➔ 教務主任核定標準程序
+                第一層 計畫人員初審做確認 ➔ 第二層 招設組複審 ➔ 第三層 教務主任核定
               </p>
             </div>
           </div>
@@ -459,7 +459,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                 className="mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-0"
               />
               <span className="text-slate-700 leading-relaxed">
-                我已詳閱並切結遵守學校教學設備借用要點：<strong>本單須於借用日前 3 天提出</strong>，借出後<strong>如期於 3 日內歸還</strong>；使用期間負妥善保管責任，若有特殊原因需延長借期，同意另案循程序送招設組及教務主任核定。
+                我已詳閱並切結遵守學校教學設備借用要點：借用設備與教室 一律為學校教職員；請先查詢設備或教室閒置狀態， <strong>須於借用日 1 日前先行登記</strong>，借用後<strong>須於 3 日內歸還</strong>。如有特殊教學需求延長，請填具「特殊原因延長借用申請」，經 <strong>教務處 計畫人員 確認 第一層 專科教室鑰匙保管者</strong> 、 <strong>招設組審查 第二層</strong> 、<strong>教務主任核定 第三層</strong>。
               </span>
             </label>
           </div>

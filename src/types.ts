@@ -1,4 +1,4 @@
-export type UserRole = 'faculty' | 'section_officer' | 'academic_director';
+export type UserRole = 'faculty' | 'project_staff' | 'section_officer' | 'academic_director';
 
 export interface UserProfile {
   id: string;
@@ -44,15 +44,17 @@ export interface ResourceItem {
 }
 
 export type ReservationStatus = 
-  | 'pending_section'     // 待招設組業務審核
-  | 'section_approved'    // 招設組初審通過，待教務主任核定
-  | 'rejected_section'    // 招設組退回
-  | 'approved'            // 教務主任核定通過 (待借出)
-  | 'rejected_director'   // 教務主任退回
-  | 'borrowed'            // 已領取/使用中
-  | 'extension_pending'   // 延長借用審核中
-  | 'returned'            // 已歸還結案
-  | 'cancelled';          // 申請人取消
+  | 'pending_project_staff' // 第一層：待教務處計畫人員初審確認 (專科教室鑰匙保管查核)
+  | 'pending_section'       // 第二層：計畫人員初審通過，待招設組複審
+  | 'section_approved'      // 第三層：招設組複審通過，待教務主任核定
+  | 'approved'              // 核定通過：教務主任核定准予借用 (借用行政程序完成，待借出/點交)
+  | 'rejected_project_staff'// 第一層：教務處計畫人員初審退回
+  | 'rejected_section'      // 第二層：招設組複審退回
+  | 'rejected_director'     // 第三層：教務主任核定退回
+  | 'borrowed'              // 已領取/使用中
+  | 'extension_pending'     // 延長借用審核中
+  | 'returned'              // 已歸還結案
+  | 'cancelled';            // 申請人取消
 
 export interface ExtensionRequest {
   id: string;
@@ -61,6 +63,10 @@ export interface ExtensionRequest {
   daysExtended: number;
   reason: string;
   submittedAt: string;
+  projectStaffStatus?: 'pending' | 'approved' | 'rejected';
+  projectStaffNote?: string;
+  projectStaffReviewer?: string;
+  projectStaffReviewedAt?: string;
   sectionStatus: 'pending' | 'approved' | 'rejected';
   sectionNote?: string;
   sectionReviewer?: string;
@@ -73,7 +79,7 @@ export interface ExtensionRequest {
 
 export interface ApprovalLog {
   id: string;
-  step: 'submission' | 'section_review' | 'director_approval' | 'checkout' | 'extension_submission' | 'extension_section' | 'extension_director' | 'checkin';
+  step: 'submission' | 'project_staff_review' | 'section_review' | 'director_approval' | 'checkout' | 'extension_submission' | 'extension_project_staff' | 'extension_section' | 'extension_director' | 'checkin';
   actorName: string;
   actorRole: string;
   action: string;
@@ -110,12 +116,17 @@ export interface Reservation {
   status: ReservationStatus;
   submittedAt: string;
   
-  // 招設組審核欄位
+  // 第一層 教務處計畫人員初審確認欄位
+  projectStaffReviewer?: string;
+  projectStaffNote?: string;
+  projectStaffReviewedAt?: string;
+
+  // 第二層 招設組複審欄位
   sectionReviewer?: string;
   sectionNote?: string;
   sectionReviewedAt?: string;
   
-  // 教務主任核定欄位
+  // 第三層 教務主任核定欄位
   directorReviewer?: string;
   directorNote?: string;
   directorReviewedAt?: string;

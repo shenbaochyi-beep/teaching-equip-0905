@@ -19,7 +19,8 @@ import {
   ChevronDown,
   Globe,
   UserCheck,
-  Radio
+  Radio,
+  KeyRound
 } from 'lucide-react';
 import { daysBetween, getTodayString } from '../utils/dateUtils';
 
@@ -56,22 +57,26 @@ export const MyReservations: React.FC<MyReservationsProps> = ({
 
   const getStatusDisplay = (status: ReservationStatus) => {
     switch (status) {
+      case 'pending_project_staff':
+        return { label: '待計畫人員初審確認 (第一層)', color: 'bg-teal-50 text-teal-800 border-teal-300', icon: <KeyRound className="w-3.5 h-3.5 text-teal-600" /> };
       case 'pending_section':
-        return { label: '待招設組業務審核', color: 'bg-amber-50 text-amber-800 border-amber-300', icon: <Clock className="w-3.5 h-3.5 text-amber-600" /> };
+        return { label: '待招設組業務複審 (第二層)', color: 'bg-amber-50 text-amber-800 border-amber-300', icon: <Clock className="w-3.5 h-3.5 text-amber-600" /> };
       case 'section_approved':
-        return { label: '招設組初審通過 · 待主任核定', color: 'bg-indigo-50 text-indigo-800 border-indigo-300', icon: <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" /> };
+        return { label: '招設組複審通過 · 待主任核定 (第三層)', color: 'bg-indigo-50 text-indigo-800 border-indigo-300', icon: <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" /> };
       case 'approved':
-        return { label: '教務主任核定通過 · 待出借', color: 'bg-emerald-50 text-emerald-800 border-emerald-300', icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> };
+        return { label: '教務主任核定通過 · 行政完成待出借', color: 'bg-emerald-50 text-emerald-800 border-emerald-300', icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> };
       case 'borrowed':
         return { label: '使用中 (已點交)', color: 'bg-sky-50 text-sky-800 border-sky-300', icon: <Sparkles className="w-3.5 h-3.5 text-sky-600" /> };
       case 'extension_pending':
         return { label: '特殊延長申請審核中', color: 'bg-purple-50 text-purple-800 border-purple-300', icon: <FileText className="w-3.5 h-3.5 text-purple-600" /> };
       case 'returned':
         return { label: '已歸還結案', color: 'bg-slate-100 text-slate-700 border-slate-300', icon: <CheckCircle2 className="w-3.5 h-3.5 text-slate-500" /> };
+      case 'rejected_project_staff':
+        return { label: '第一層計畫人員退回', color: 'bg-rose-50 text-rose-800 border-rose-300', icon: <XCircle className="w-3.5 h-3.5 text-rose-600" /> };
       case 'rejected_section':
-        return { label: '招設組退回', color: 'bg-rose-50 text-rose-800 border-rose-300', icon: <XCircle className="w-3.5 h-3.5 text-rose-600" /> };
+        return { label: '第二層招設組退回', color: 'bg-rose-50 text-rose-800 border-rose-300', icon: <XCircle className="w-3.5 h-3.5 text-rose-600" /> };
       case 'rejected_director':
-        return { label: '教務主任退回', color: 'bg-rose-50 text-rose-800 border-rose-300', icon: <XCircle className="w-3.5 h-3.5 text-rose-600" /> };
+        return { label: '第三層教務主任退回', color: 'bg-rose-50 text-rose-800 border-rose-300', icon: <XCircle className="w-3.5 h-3.5 text-rose-600" /> };
       case 'cancelled':
         return { label: '申請人已取消', color: 'bg-slate-100 text-slate-500 border-slate-300', icon: <XCircle className="w-3.5 h-3.5 text-slate-400" /> };
     }
@@ -80,7 +85,7 @@ export const MyReservations: React.FC<MyReservationsProps> = ({
   const filteredList = baseList.filter(res => {
     if (filterStatus === 'all') return true;
     if (filterStatus === 'active') {
-      return res.status === 'borrowed' || res.status === 'extension_pending' || res.status === 'approved' || res.status === 'section_approved' || res.status === 'pending_section';
+      return res.status === 'borrowed' || res.status === 'extension_pending' || res.status === 'approved' || res.status === 'section_approved' || res.status === 'pending_section' || res.status === 'pending_project_staff';
     }
     if (filterStatus === 'completed') {
       return res.status === 'returned';
@@ -196,9 +201,9 @@ export const MyReservations: React.FC<MyReservationsProps> = ({
             const isExpanded = expandedLogId === res.id;
             const daysLeft = daysBetween(todayStr, res.expectedReturnDate);
             const isMyRecord = res.applicantId === currentUser.id;
-            const isManager = currentUser.role === 'section_officer' || currentUser.role === 'academic_director';
+            const isManager = currentUser.role === 'section_officer' || currentUser.role === 'academic_director' || currentUser.role === 'project_staff';
             const canExtend = isMyRecord && (res.status === 'borrowed' || res.status === 'approved');
-            const canCancel = (isMyRecord || isManager) && (res.status === 'pending_section' || res.status === 'section_approved');
+            const canCancel = (isMyRecord || isManager) && (res.status === 'pending_project_staff' || res.status === 'pending_section' || res.status === 'section_approved');
 
             return (
               <div
@@ -278,32 +283,62 @@ export const MyReservations: React.FC<MyReservationsProps> = ({
                     )}
                   </div>
 
-                  {/* 審核狀態卡片 */}
-                  <div className="md:col-span-1 bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1.5">
-                    <div className="text-slate-700 font-semibold flex items-center justify-between">
-                      <span className="flex items-center gap-1">
-                        <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />
-                        二級簽核進度：
+                  {/* 三層行政簽核進度卡片 */}
+                  <div className="md:col-span-1 bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-2">
+                    <div className="text-slate-700 font-semibold flex items-center justify-between pb-1 border-b border-slate-200">
+                      <span className="flex items-center gap-1 text-slate-800">
+                        <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
+                        三層機制行政簽核進度：
                       </span>
                     </div>
                     
+                    {/* 1. 第一層 計畫人員初審做確認 */}
                     <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-slate-500">1. 招設組業務審查：</span>
-                      <span className={res.sectionReviewer ? 'text-emerald-700 font-semibold' : 'text-slate-400'}>
-                        {res.sectionReviewer ? `已由 ${res.sectionReviewer} 初審` : '⏳ 待招設組審理'}
+                      <span className="text-slate-500 flex items-center gap-1">
+                        <KeyRound className="w-3 h-3 text-teal-600" />
+                        1. 計畫人員初審確認：
+                      </span>
+                      <span className={res.projectStaffReviewer ? 'text-teal-700 font-semibold' : (res.status === 'pending_project_staff' ? 'text-amber-600 font-bold animate-pulse' : 'text-slate-400')}>
+                        {res.projectStaffReviewer ? `✓ 已初審確認` : (res.status === 'pending_project_staff' ? '⏳ 待第一層初審' : '-')}
                       </span>
                     </div>
 
+                    {/* 2. 第二層 招設組複審 */}
                     <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-slate-500">2. 教務主任核定：</span>
-                      <span className={res.directorReviewer ? 'text-purple-700 font-semibold' : 'text-slate-400'}>
-                        {res.directorReviewer ? `已由 ${res.directorReviewer} 核定` : '⏳ 待主任核定'}
+                      <span className="text-slate-500 flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-sky-600" />
+                        2. 招設組業務複審：
+                      </span>
+                      <span className={res.sectionReviewer ? 'text-sky-700 font-semibold' : (res.status === 'pending_section' ? 'text-amber-600 font-bold animate-pulse' : 'text-slate-400')}>
+                        {res.sectionReviewer ? `✓ 已複審通過` : (res.status === 'pending_section' ? '⏳ 待第二層複審' : (res.status === 'pending_project_staff' ? '待初審後進入' : '-'))}
                       </span>
                     </div>
 
+                    {/* 3. 第三層 教務主任核定 */}
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-slate-500 flex items-center gap-1">
+                        <GraduationCap className="w-3 h-3 text-purple-600" />
+                        3. 教務主任主管核定：
+                      </span>
+                      <span className={res.directorReviewer ? 'text-purple-700 font-semibold' : (res.status === 'section_approved' ? 'text-amber-600 font-bold animate-pulse' : 'text-slate-400')}>
+                        {res.directorReviewer ? `✓ 主管已核定` : (res.status === 'section_approved' ? '⏳ 待主任核定' : '-')}
+                      </span>
+                    </div>
+
+                    {/* 備註訊息展示 */}
+                    {res.projectStaffNote && (
+                      <div className="text-[10px] text-teal-800 bg-teal-50 p-1.5 rounded border border-teal-200" title={res.projectStaffNote}>
+                        初審意見：{res.projectStaffNote}
+                      </div>
+                    )}
                     {res.sectionNote && (
-                      <div className="text-[10px] text-slate-600 bg-white p-1.5 rounded border border-slate-200 truncate" title={res.sectionNote}>
-                        招設組意見：{res.sectionNote}
+                      <div className="text-[10px] text-sky-800 bg-sky-50 p-1.5 rounded border border-sky-200" title={res.sectionNote}>
+                        複審意見：{res.sectionNote}
+                      </div>
+                    )}
+                    {res.directorNote && (
+                      <div className="text-[10px] text-purple-800 bg-purple-50 p-1.5 rounded border border-purple-200" title={res.directorNote}>
+                        核定意見：{res.directorNote}
                       </div>
                     )}
                   </div>

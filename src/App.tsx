@@ -4,6 +4,7 @@ import { Header } from './components/Header';
 import { RulesBanner } from './components/RulesBanner';
 import { ResourceExplorer } from './components/ResourceExplorer';
 import { MyReservations } from './components/MyReservations';
+import { ProjectStaffReviewPanel } from './components/ProjectStaffReviewPanel';
 import { SectionReviewPanel } from './components/SectionReviewPanel';
 import { DirectorApprovalPanel } from './components/DirectorApprovalPanel';
 import { CalendarScheduleView } from './components/CalendarScheduleView';
@@ -139,6 +140,18 @@ const MainAppContent: React.FC = () => {
                   onOpenExtensionModal={handleOpenExtension}
                   onOpenPrintModal={handleOpenPrint}
                 />
+              </motion.div>
+            )}
+
+            {activeTab === 'project_staff_review' && (
+              <motion.div
+                key="project_staff_review"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ProjectStaffReviewPanel />
               </motion.div>
             )}
 

@@ -30,7 +30,20 @@ export const INITIAL_USERS: UserProfile[] = [
     avatarBg: 'bg-sky-700'
   },
 
-  // 3. 校長室秘書
+  // 3. 教務處計畫人員 (第一層初審做確認 · 專科教室鑰匙保管者)
+  {
+    id: 'user-project-staff',
+    username: 'slvs280',
+    name: '教務處計畫人員',
+    role: 'project_staff',
+    title: '教務處計畫人員 (第一層初審確認)',
+    department: '教務處 計畫專案辦公室 (專科教室鑰匙保管)',
+    email: 'project280@school.edu.tw',
+    phone: '分機 280',
+    avatarBg: 'bg-teal-700'
+  },
+
+  // 4. 校長室秘書
   {
     id: 'user-sec-zheng',
     username: 'slvs101',
@@ -680,8 +693,11 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
     expectedReturnTime: '16:30',
     status: 'section_approved',
     submittedAt: `${today} 11:20`,
+    projectStaffReviewer: '教務處計畫人員',
+    projectStaffNote: '專科教室鑰匙已確認在室，第一層初審做確認無誤，呈報第二層招設組複審。',
+    projectStaffReviewedAt: `${today} 12:10`,
     sectionReviewer: '林彥伊 招設組長',
-    sectionNote: '電子觸控白板已更新系統，分組桌椅已配置為 6 組型態，初審通過呈送教務主任核定。',
+    sectionNote: '電子觸控白板已更新系統，分組桌椅已配置為 6 組型態，複審通過呈送教務主任第三層核定。',
     sectionReviewedAt: `${today} 13:40`,
     approvalLogs: [
       {
@@ -689,19 +705,29 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
         step: 'submission',
         actorName: '卓銘欣 老師',
         actorRole: '申請人 (一年孝班 導師)',
-        action: '送出多功能教室借用申請 (提前30天登記)',
+        action: '送出多功能教室借用申請 (提前30天登記，提請第一層計畫人員初審確認)',
         timestamp: `${today} 11:20`,
-        statusChange: '待招設組審核'
+        statusChange: '待第一層計畫人員初審'
+      },
+      {
+        id: 'log-21-b',
+        step: 'project_staff_review',
+        actorName: '教務處計畫人員',
+        actorRole: '教務處計畫人員 (第一層初審確認)',
+        action: '第一層初審確認通過 (專科教室鑰匙保管與設備閒置查核無誤，送第二層招設組複審)',
+        timestamp: `${today} 12:10`,
+        comment: '專科教室鑰匙保管狀況良好，同意提報第二層複審。',
+        statusChange: '初審確認通過 · 待招設組複審'
       },
       {
         id: 'log-22',
         step: 'section_review',
         actorName: '林彥伊 招設組長',
-        actorRole: '教務處招設組承辦人',
-        action: '初審核可，呈送黃寀霓教務主任最終裁決',
+        actorRole: '教務處招設組承辦人 (第二層複審)',
+        action: '第二層複審通過，呈送黃寀霓教務主任第三層核定',
         timestamp: `${today} 13:40`,
-        comment: '符合30天前登記與3天內歸還規定。',
-        statusChange: '待教務主任核定'
+        comment: '符合30天前登記與3天內歸還規定，複審通過。',
+        statusChange: '複審通過 · 待教務主任核定'
       }
     ]
   },
@@ -743,6 +769,10 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
       daysExtended: 4,
       reason: '【特殊原因申請】因配合教育部數位前瞻計畫訪視與全校跨科觀課成果展演，需延長使用筆記型電腦進行連續性課堂觀測與評量數據留存，懇請准予延長借用4日。',
       submittedAt: today + ' 14:30',
+      projectStaffStatus: 'approved',
+      projectStaffNote: '因配合專案訪視延長使用屬實，第一層初審做確認同意，呈送招設組複審。',
+      projectStaffReviewer: '教務處計畫人員',
+      projectStaffReviewedAt: today + ' 14:50',
       sectionStatus: 'approved',
       sectionNote: '經查下週筆記型電腦尚有餘裕可供其他班級調度，無時段衝突，建議准予延長。',
       sectionReviewer: '林彥伊 招設組長',
@@ -828,7 +858,7 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
     startTime: '08:30',
     expectedReturnDate: addDays(today, 37),
     expectedReturnTime: '12:00',
-    status: 'pending_section',
+    status: 'pending_project_staff',
     submittedAt: `${today} 15:00`,
     approvalLogs: [
       {
@@ -836,9 +866,9 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
         step: 'submission',
         actorName: '鄭安順 秘書',
         actorRole: '申請人 (秘書)',
-        action: '送出合作學習教室借用登記單 (提前35天預約登記)',
+        action: '送出合作學習教室借用登記單 (提前35天預約登記，提請第一層教務處計畫人員初審確認)',
         timestamp: `${today} 15:00`,
-        statusChange: '待招設組業務審核'
+        statusChange: '待第一層計畫人員初審確認'
       }
     ]
   }
@@ -857,9 +887,9 @@ export const INITIAL_NOTIFICATIONS: SystemNotification[] = [
   },
   {
     id: 'notif-2',
-    userId: 'user-officer-lin',
-    title: '新借用申請待審核',
-    message: '鄭安順 秘書提出【合作學習教室】借用預約申請 (單號: EDU-20260826-004)，請招設組林彥伊組長進行業務初審。',
+    userId: 'user-project-staff',
+    title: '新借用申請待第一層初審確認',
+    message: '鄭安順 秘書提出【合作學習教室】借用預約申請 (單號: EDU-20260826-004)，請教務處計畫人員進行第一層初審做確認。',
     type: 'info',
     timestamp: '今天 15:00',
     read: false,

@@ -19,7 +19,8 @@ import {
   MessageSquare,
   Search,
   Filter,
-  Lock
+  Lock,
+  KeyRound
 } from 'lucide-react';
 import { daysBetween, getTodayString } from '../utils/dateUtils';
 
@@ -71,20 +72,20 @@ export const SectionReviewPanel: React.FC = () => {
             <div className="flex items-center gap-2 mb-1.5">
               <span className="px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/40 text-xs font-semibold flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5" />
-                教務處 招設組（教學設備組）業務處理平台
+                第二層複審 · 教務處 招設組（教學設備組）業務處理平台
               </span>
             </div>
             <h2 className="text-xl font-bold tracking-tight">
-              設備與教室借用業務審查及點交管理
+              設備與教室借用業務審查（第二層複審）及點交管理
             </h2>
             <p className="text-xs text-sky-200/80 mt-1 max-w-2xl leading-relaxed">
-              負責全校教學設備與專用教室之借用初審、衝突調度、特殊延長案審查、實體點交出借與歸還驗收作業。初審同意後即呈報教務主任進行主管核定。
+              負責全校教學設備與專用教室借用之第二層複審、設備衝突調度、特殊延長案複審、實體點交出借與歸還驗收作業。經第一層計畫人員初審確認後，由招設組進行第二層複審，複審通過後呈送教務主任進行第三層最終核定。
             </p>
           </div>
 
           <div className="flex items-center gap-2 bg-slate-900/80 p-2 rounded-xl border border-sky-800/60 text-xs">
             <div className="text-right">
-              <div className="text-slate-400">目前待初審案件</div>
+              <div className="text-slate-400">目前待複審案件</div>
               <div className="text-lg font-bold text-amber-400">
                 {pendingReservations.length + pendingExtensions.length} 件
               </div>
@@ -103,7 +104,7 @@ export const SectionReviewPanel: React.FC = () => {
             }`}
           >
             <Clock className="w-3.5 h-3.5" />
-            1. 新借用申請初審 ({pendingReservations.length})
+            1. 新借用申請第二層複審 ({pendingReservations.length})
           </button>
 
           <button
@@ -115,7 +116,7 @@ export const SectionReviewPanel: React.FC = () => {
             }`}
           >
             <FileText className="w-3.5 h-3.5 text-purple-300" />
-            2. 特殊延長借用初審 ({pendingExtensions.length})
+            2. 特殊延長借用第二層複審 ({pendingExtensions.length})
           </button>
 
           <button
@@ -191,10 +192,28 @@ export const SectionReviewPanel: React.FC = () => {
                         {res.resourceName} <span className="text-xs font-mono text-slate-500 font-normal">({res.resourceCode})</span>
                       </span>
                     </div>
-                    <div className="text-xs text-slate-400">
-                      送單時間：{res.submittedAt}
+                    <div className="flex items-center gap-2">
+                      <span className="text-emerald-800 font-semibold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 text-xs flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        第一層初審已確認 (計畫人員)
+                      </span>
+                      <span className="text-xs text-slate-400">
+                        {res.submittedAt}
+                      </span>
                     </div>
                   </div>
+
+                  {/* 第一層 計畫人員初審查核備註 */}
+                  {res.projectStaffReviewer && (
+                    <div className="bg-teal-50 border border-teal-200 p-2.5 rounded-xl text-xs flex items-start gap-2">
+                      <KeyRound className="w-4 h-4 text-teal-700 shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <span className="font-bold text-teal-900">第一層初審查核（{res.projectStaffReviewer} · 專科教室鑰匙保管者）：</span>
+                        <span className="text-teal-800 ml-1">{res.projectStaffNote || '鑰匙保管備存正常，同意初審通過送招設組複審。'}</span>
+                        {res.projectStaffReviewedAt && <span className="text-teal-600 text-[10px] ml-2">({res.projectStaffReviewedAt})</span>}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                     {/* 申請人資訊 */}
@@ -226,18 +245,18 @@ export const SectionReviewPanel: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* 初審意見與操作 */}
+                  {/* 複審意見與操作 */}
                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
                     <div>
                       <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
                         <MessageSquare className="w-3.5 h-3.5 text-sky-600" />
-                        招設組初審意見與調配備註 (將同步呈報教務主任與通知申請人)：
+                        第二層 招設組複審意見與調配備註 (將同步呈報第三層教務主任核定)：
                       </label>
                       <input
                         type="text"
                         value={note}
                         onChange={(e) => handleNoteChange(res.id, e.target.value)}
-                        placeholder="例：經檢視設備妥善率良好、時段無衝突，同意出借並呈送主任核定。"
+                        placeholder="例：經檢視設備妥善率良好、時段無衝突，第二層複審通過，同意出借並呈送教務主任核定。"
                         className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-600"
                       />
                     </div>
@@ -248,14 +267,14 @@ export const SectionReviewPanel: React.FC = () => {
                         className="px-4 py-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5"
                       >
                         <XCircle className="w-4 h-4" />
-                        退回申請
+                        複審退回
                       </button>
                       <button
-                        onClick={() => reviewBySection(res.id, 'approve', note || '設備檢測完妥無衝突，初審同意呈請主任核定')}
+                        onClick={() => reviewBySection(res.id, 'approve', note || '設備檢測完妥無衝突，第二層複審通過，呈請教務主任核定')}
                         className="px-5 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
                       >
                         <CheckCircle2 className="w-4 h-4" />
-                        初審同意 ➔ 呈送教務主任核定
+                        第二層複審通過 ➔ 呈送教務主任核定 (第三層)
                       </button>
                     </div>
                   </div>

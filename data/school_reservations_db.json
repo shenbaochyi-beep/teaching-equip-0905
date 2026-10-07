@@ -372,7 +372,7 @@
       "startTime": "08:30",
       "expectedReturnDate": "2026-11-12",
       "expectedReturnTime": "12:00",
-      "status": "pending_section",
+      "status": "pending_project_staff",
       "submittedAt": "2026-10-06 15:00",
       "approvalLogs": [
         {
@@ -380,9 +380,9 @@
           "step": "submission",
           "actorName": "鄭安順 秘書",
           "actorRole": "申請人 (秘書)",
-          "action": "送出合作學習教室借用登記單 (提前35天預約登記)",
+          "action": "送出合作學習教室借用登記單 (提請第一層教務處計畫人員初審確認)",
           "timestamp": "2026-10-06 15:00",
-          "statusChange": "待招設組業務審核"
+          "statusChange": "待第一層計畫人員初審確認"
         }
       ]
     }

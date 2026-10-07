@@ -61,10 +61,12 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
     switch (role) {
       case 'faculty':
         return { label: '申請教職員', icon: <UserCheck className="w-3.5 h-3.5" />, color: 'bg-emerald-100 text-emerald-800 border-emerald-300' };
+      case 'project_staff':
+        return { label: '教務處計畫人員 (第一層初審)', icon: <KeyRound className="w-3.5 h-3.5" />, color: 'bg-teal-100 text-teal-800 border-teal-300' };
       case 'section_officer':
-        return { label: '教務處招設組 (承辦審核)', icon: <ShieldCheck className="w-3.5 h-3.5" />, color: 'bg-sky-100 text-sky-800 border-sky-300' };
+        return { label: '教務處招設組 (第二層複審)', icon: <ShieldCheck className="w-3.5 h-3.5" />, color: 'bg-sky-100 text-sky-800 border-sky-300' };
       case 'academic_director':
-        return { label: '教務主任 (主管核定)', icon: <GraduationCap className="w-3.5 h-3.5" />, color: 'bg-purple-100 text-purple-800 border-purple-300' };
+        return { label: '教務主任 (第三層核定)', icon: <GraduationCap className="w-3.5 h-3.5" />, color: 'bg-purple-100 text-purple-800 border-purple-300' };
     }
   };
 
@@ -80,7 +82,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
             今日：{todayStr}
           </span>
           <span className="hidden sm:inline text-blue-300/80">
-            📌 依規定：借用須於借用日 <strong className="text-white underline decoration-amber-400 underline-offset-2">30 日前</strong> 先行登記（最早預約日：{earliestDateStr}），借用後須於 <strong className="text-white underline decoration-amber-400 underline-offset-2">3 日內</strong> 歸還。
+            📌 依規定：借用設備與教室一律為學校教職員；請先查詢設備或教室閒置狀態，須於借用日 <strong className="text-white underline decoration-amber-400 underline-offset-2">1 日前</strong> 先行登記，借用後須於 <strong className="text-white underline decoration-amber-400 underline-offset-2">3 日內</strong> 歸還。
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -396,7 +398,32 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
             </span>
           </button>
 
-          {/* 教務處招設組專屬頁籤 */}
+          {/* 第一層：教務處計畫人員初審台 (專科教室鑰匙保管者) */}
+          <button
+            id="nav-project-staff-review"
+            onClick={() => {
+              if (!isAuthenticated) {
+                setIsLoginModalOpen(true);
+                return;
+              }
+              setActiveTab('project_staff_review');
+            }}
+            className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all shrink-0 ${
+              activeTab === 'project_staff_review'
+                ? 'bg-teal-600 text-white font-semibold shadow'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800'
+            }`}
+          >
+            <KeyRound className="w-4 h-4 text-teal-400" />
+            教務處計畫人員初審台 (第一層)
+            {stats.pendingProjectStaffCount > 0 && (
+              <span className="px-1.5 py-0.2 bg-amber-400 text-slate-900 text-[10px] font-bold rounded-full">
+                {stats.pendingProjectStaffCount}
+              </span>
+            )}
+          </button>
+
+          {/* 第二層：教務處招設組複審台 */}
           <button
             id="nav-section-review"
             onClick={() => {
@@ -413,7 +440,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
             }`}
           >
             <ShieldCheck className="w-4 h-4 text-sky-400" />
-            教務處招設組審核台
+            教務處招設組複審台 (第二層)
             {stats.pendingSectionCount > 0 && (
               <span className="px-1.5 py-0.2 bg-amber-500 text-slate-900 text-[10px] font-bold rounded-full">
                 {stats.pendingSectionCount}
@@ -421,7 +448,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
             )}
           </button>
 
-          {/* 教務主任核定專屬頁籤 */}
+          {/* 第三層：教務主任核定專屬頁籤 */}
           <button
             id="nav-director-approval"
             onClick={() => {
@@ -438,7 +465,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
             }`}
           >
             <FileCheck className="w-4 h-4 text-purple-400" />
-            教務主任核定中心
+            教務主任核定中心 (第三層)
             {stats.pendingDirectorCount > 0 && (
               <span className="px-1.5 py-0.2 bg-rose-500 text-white text-[10px] font-bold rounded-full">
                 {stats.pendingDirectorCount}

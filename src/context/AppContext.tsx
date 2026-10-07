@@ -84,14 +84,21 @@ interface AppContextType {
   
   cancelReservation: (reservationId: string, reason?: string) => void;
   
-  // 招設組審查業務
+  // 第一層：教務處計畫人員初審做確認 (專科教室鑰匙保管查核)
+  reviewByProjectStaff: (
+    reservationId: string, 
+    decision: 'approve' | 'reject', 
+    note: string
+  ) => void;
+
+  // 第二層：招設組業務審查 (複審)
   reviewBySection: (
     reservationId: string, 
     decision: 'approve' | 'reject', 
     note: string
   ) => void;
   
-  // 教務主任核定業務
+  // 第三層：教務主任核定業務 (最終核定)
   reviewByDirector: (
     reservationId: string, 
     decision: 'approve' | 'reject', 
@@ -114,14 +121,21 @@ interface AppContextType {
     reason: string
   ) => { success: boolean; error?: string };
   
-  // 招設組審核延長
+  // 第一層：計畫人員審核延長
+  reviewExtensionByProjectStaff: (
+    reservationId: string, 
+    decision: 'approve' | 'reject', 
+    note: string
+  ) => void;
+
+  // 第二層：招設組審核延長 (複審)
   reviewExtensionBySection: (
     reservationId: string, 
     decision: 'approve' | 'reject', 
     note: string
   ) => void;
   
-  // 教務主任核定延長
+  // 第三層：教務主任核定延長 (最終核定)
   reviewExtensionByDirector: (
     reservationId: string, 
     decision: 'approve' | 'reject', 
@@ -140,6 +154,7 @@ interface AppContextType {
   stats: {
     totalResources: number;
     availableResources: number;
+    pendingProjectStaffCount: number;
     pendingSectionCount: number;
     pendingDirectorCount: number;
     pendingExtensionCount: number;
@@ -740,7 +755,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       expectedReturnDate: data.expectedReturnDate,
       expectedReturnTime: data.expectedReturnTime,
       
-      status: 'pending_section',
+      status: 'pending_project_staff',
       submittedAt: nowTimeStr,
       approvalLogs: [
         {
@@ -748,9 +763,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           step: 'submission',
           actorName: applicant.name,
           actorRole: `${applicant.title} (${applicant.department})`,
-          action: '送出借用登記申請 (符合借用前30日預約規定)',
+          action: '送出借用登記申請 (提報第一層教務處計畫人員初審做確認)',
           timestamp: nowTimeStr,
-          statusChange: '待招設組業務審核'
+          statusChange: '待第一層計畫人員初審確認'
         }
       ]
     };
@@ -758,19 +773,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setReservations(prev => [newReservation, ...prev]);
     sendServerReservation(newReservation);
 
-    // 通知招設組
-    const sectionOfficer = INITIAL_USERS.find(u => u.role === 'section_officer');
-    if (sectionOfficer) {
+    // 通知第一層教務處計畫人員
+    const projectStaff = INITIAL_USERS.find(u => u.username === 'slvs280' || u.role === 'project_staff');
+    if (projectStaff) {
       addNotification(
-        sectionOfficer.id,
-        '新設備借用申請通知',
-        `${applicant.name} 申請借用【${targetResource.name}】（單號：${newTracking}），借用期間：${data.startDate} 至 ${data.expectedReturnDate}，請招設組進行初審。`,
+        projectStaff.id,
+        '新借用申請待第一層初審確認',
+        `${applicant.name} 申請借用【${targetResource.name}】（單號：${newTracking}），借用期間：${data.startDate} 至 ${data.expectedReturnDate}，請教務處計畫人員進行第一層初審做確認。`,
         'info',
         newReservation.id
       );
     }
 
-    showToast('success', '借用預約申請已送出', `借用單號：${newTracking}，已送交教務處招設組審核。`);
+    showToast('success', '借用預約申請已送出', `借用單號：${newTracking}，已送交第一層教務處計畫人員進行初審確認。`);
     return { success: true, reservation: newReservation };
   };
 
@@ -797,7 +812,73 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('info', '已取消借用申請', '該筆預約已變更為取消狀態。');
   };
 
-    // 招設組審查
+  // 第一層：教務處計畫人員初審做確認 (專科教室鑰匙保管查核)
+  const reviewByProjectStaff = (reservationId: string, decision: 'approve' | 'reject', note: string) => {
+    const nowTimeStr = formatDateTime(new Date());
+    const newStatus: ReservationStatus = decision === 'approve' ? 'pending_section' : 'rejected_project_staff';
+    sendServerReservationUpdate(reservationId, {
+      status: newStatus,
+      projectStaffReviewer: `${currentUser.name} (${currentUser.title})`,
+      projectStaffNote: note,
+      projectStaffReviewedAt: nowTimeStr
+    });
+
+    setReservations(prev => prev.map(res => {
+      if (res.id !== reservationId) return res;
+      
+      const log: ApprovalLog = {
+        id: 'log-' + Date.now(),
+        step: 'project_staff_review',
+        actorName: currentUser.name,
+        actorRole: '教務處計畫人員 (第一層初審確認)',
+        action: decision === 'approve' 
+          ? '第一層初審確認通過 (專科教室鑰匙保管與設備閒置查核無誤，送第二層招設組複審)' 
+          : '第一層初審退回',
+        timestamp: nowTimeStr,
+        comment: note,
+        statusChange: decision === 'approve' ? '初審確認通過 · 待招設組複審' : '計畫人員初審退回'
+      };
+
+      // 通知第二層招設組 (若確認通過) 或 通知申請人 (若退回)
+      if (decision === 'approve') {
+        const sectionOfficer = INITIAL_USERS.find(u => u.role === 'section_officer');
+        if (sectionOfficer) {
+          addNotification(
+            sectionOfficer.id,
+            '待第二層複審借用案提報',
+            `【${res.resourceName}】(單號: ${res.trackingNumber}，申請人: ${res.applicantName}) 計畫人員第一層初審已確認通過，請招設組長進行第二層複審。`,
+            'info',
+            res.id
+          );
+        }
+      } else {
+        addNotification(
+          res.applicantId,
+          '借用申請第一層初審退回通知',
+          `您申請的【${res.resourceName}】（單號：${res.trackingNumber}）第一層計畫人員初審未通過，原因：${note || '專科教室鑰匙時段衝突或不符要件'}。`,
+          'warning',
+          res.id
+        );
+      }
+
+      return {
+        ...res,
+        status: newStatus,
+        projectStaffReviewer: `${currentUser.name} (${currentUser.title})`,
+        projectStaffNote: note,
+        projectStaffReviewedAt: nowTimeStr,
+        approvalLogs: [...res.approvalLogs, log]
+      };
+    }));
+
+    showToast(
+      decision === 'approve' ? 'success' : 'warning',
+      decision === 'approve' ? '第一層初審確認通過' : '已退回借用申請',
+      decision === 'approve' ? '已提報第二層招設組進行業務複審。' : `退回備註：${note || '無'}`
+    );
+  };
+
+  // 第二層：招設組審查 (複審)
   const reviewBySection = (reservationId: string, decision: 'approve' | 'reject', note: string) => {
     const nowTimeStr = formatDateTime(new Date());
     const newStatus: ReservationStatus = decision === 'approve' ? 'section_approved' : 'rejected_section';
@@ -815,11 +896,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         id: 'log-' + Date.now(),
         step: 'section_review',
         actorName: currentUser.name,
-        actorRole: '教務處招設組承辦人',
-        action: decision === 'approve' ? '招設組初審同意，呈送教務主任核定' : '招設組初審退回',
+        actorRole: '教務處招設組承辦人 (第二層複審)',
+        action: decision === 'approve' ? '第二層複審通過 (設備調度排程無誤，呈送教務主任第三層核定)' : '第二層招設組複審退回',
         timestamp: nowTimeStr,
         comment: note,
-        statusChange: decision === 'approve' ? '待教務主任核定' : '招設組退回'
+        statusChange: decision === 'approve' ? '複審通過 · 待主任核定' : '招設組複審退回'
       };
 
       // 通知教務主任 (若審核通過) 或 通知申請人 (若退回)
@@ -828,8 +909,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (director) {
           addNotification(
             director.id,
-            '待核定借用案呈報',
-            `招設組已初審完成【${res.resourceName}】（申請人：${res.applicantName}，單號：${res.trackingNumber}），請主任核定。`,
+            '待核定借用案呈報 (第二層複審通過)',
+            `招設組已完成第二層複審【${res.resourceName}】（申請人：${res.applicantName}，單號：${res.trackingNumber}），請教務主任批示第三層最終核定。`,
             'info',
             res.id
           );
@@ -837,8 +918,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       } else {
         addNotification(
           res.applicantId,
-          '借用申請招設組退回通知',
-          `您申請的【${res.resourceName}】（單號：${res.trackingNumber}）經招設組審查未通過，原因：${note || '未符合設備配置要件'}。`,
+          '借用申請招設組複審退回通知',
+          `您申請的【${res.resourceName}】（單號：${res.trackingNumber}）經招設組第二層審查未通過，原因：${note || '未符合設備配置要件'}。`,
           'warning',
           res.id
         );
@@ -856,8 +937,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     showToast(
       decision === 'approve' ? 'success' : 'warning',
-      decision === 'approve' ? '招設組初審通過' : '已退回借用申請',
-      decision === 'approve' ? '已呈轉教務主任進行最終核定。' : `退回備註：${note || '無'}`
+      decision === 'approve' ? '第二層複審通過' : '已退回借用申請',
+      decision === 'approve' ? '已呈轉教務主任進行第三層最終核定。' : `退回備註：${note || '無'}`
     );
   };
 
@@ -1068,11 +1149,84 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       );
     }
 
-    showToast('success', '延長借用申請已送出', '已呈送教務處招設組及教務主任進行特殊案件核定。');
+    showToast('success', '延長借用申請已送出', '已呈送教務處計畫人員、招設組及教務主任進行三層審查與核定。');
     return { success: true };
   };
 
-  // 招設組審查延長借用
+  // 第一層：計畫人員審查延長借用 (初審確認)
+  const reviewExtensionByProjectStaff = (reservationId: string, decision: 'approve' | 'reject', note: string) => {
+    const nowTimeStr = formatDateTime(new Date());
+    const target = reservations.find(r => r.id === reservationId);
+    if (target?.extension) {
+      sendServerReservationUpdate(reservationId, {
+        extension: {
+          ...target.extension,
+          projectStaffStatus: decision === 'approve' ? ('approved' as const) : ('rejected' as const),
+          projectStaffNote: note,
+          projectStaffReviewer: `${currentUser.name} (${currentUser.title})`,
+          projectStaffReviewedAt: nowTimeStr
+        }
+      });
+    }
+
+    setReservations(prev => prev.map(res => {
+      if (res.id !== reservationId || !res.extension) return res;
+
+      const updatedExt = {
+        ...res.extension,
+        projectStaffStatus: decision === 'approve' ? ('approved' as const) : ('rejected' as const),
+        projectStaffNote: note,
+        projectStaffReviewer: `${currentUser.name} (${currentUser.title})`,
+        projectStaffReviewedAt: nowTimeStr
+      };
+
+      const log: ApprovalLog = {
+        id: 'log-' + Date.now(),
+        step: 'extension_project_staff',
+        actorName: currentUser.name,
+        actorRole: '教務處計畫人員 (第一層初審確認)',
+        action: decision === 'approve' ? '計畫人員初審確認同意延長，送第二層招設組複審' : '計畫人員初審退回延長申請',
+        timestamp: nowTimeStr,
+        comment: note,
+        statusChange: decision === 'approve' ? '待第二層招設組複審延長' : '計畫人員退回延長'
+      };
+
+      if (decision === 'approve') {
+        const sectionOfficer = INITIAL_USERS.find(u => u.role === 'section_officer');
+        if (sectionOfficer) {
+          addNotification(
+            sectionOfficer.id,
+            '待第二層複審特殊延長借用案',
+            `計畫人員已完成【${res.resourceName}】延長申請第一層初審確認（申請人：${res.applicantName}，延長至 ${res.extension.requestedReturnDate}），請招設組長進行第二層複審。`,
+            'info',
+            res.id
+          );
+        }
+      } else {
+        addNotification(
+          res.applicantId,
+          '特殊延長借用第一層初審退回通知',
+          `您就【${res.resourceName}】（單號：${res.trackingNumber}）提出之延長借用申請，經教務處計畫人員第一層初審未通過，原因：${note || '專科教室時段衝突'}。`,
+          'warning',
+          res.id
+        );
+      }
+
+      return {
+        ...res,
+        extension: updatedExt,
+        approvalLogs: [...res.approvalLogs, log]
+      };
+    }));
+
+    showToast(
+      decision === 'approve' ? 'success' : 'warning',
+      decision === 'approve' ? '第一層初審確認同意延長' : '已退回延長申請',
+      decision === 'approve' ? '已呈報第二層招設組進行業務複審。' : `退回備註：${note || '無'}`
+    );
+  };
+
+  // 招設組審查延長借用 (第二層複審)
   const reviewExtensionBySection = (reservationId: string, decision: 'approve' | 'reject', note: string) => {
     const nowTimeStr = formatDateTime(new Date());
     const target = reservations.find(r => r.id === reservationId);
@@ -1324,6 +1478,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // 統計
   const stats = useMemo(() => {
     const availableResources = resources.filter(r => r.status === 'available').length;
+    const pendingProjectStaffCount = reservations.filter(r => r.status === 'pending_project_staff').length;
     const pendingSectionCount = reservations.filter(r => r.status === 'pending_section').length;
     const pendingDirectorCount = reservations.filter(r => r.status === 'section_approved').length;
     const pendingExtensionCount = reservations.filter(r => 
@@ -1336,6 +1491,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return {
       totalResources: resources.length,
       availableResources,
+      pendingProjectStaffCount,
       pendingSectionCount,
       pendingDirectorCount,
       pendingExtensionCount,
@@ -1368,11 +1524,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         removeToast,
         createReservation,
         cancelReservation,
+        reviewByProjectStaff,
         reviewBySection,
         reviewByDirector,
         checkoutReservation,
         checkinReservation,
         submitExtensionRequest,
+        reviewExtensionByProjectStaff,
         reviewExtensionBySection,
         reviewExtensionByDirector,
         updateResourceStatus,
