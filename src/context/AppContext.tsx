@@ -708,12 +708,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     const todayStr = getTodayString();
     
-    // 規則1: 必須於借用日 30 日前先行登記
+    // 規則1: 必須於借用日 1 日前先行登記
     const advanceCheck = isValidAdvanceBookingDate(data.startDate, todayStr);
     if (!advanceCheck.valid) {
       return {
         success: false,
-        error: `不符合借用規定：設備與教室預約須於借用日前 30 天登記。今日為 ${todayStr}，最早可登記借用日為 ${advanceCheck.minAllowedDate}。`
+        error: `不符合借用規定：設備與教室預約須於借用日前 1 天先行登記。今日為 ${todayStr}，最早可登記借用日為 ${advanceCheck.minAllowedDate}。`
       };
     }
 

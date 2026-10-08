@@ -166,7 +166,7 @@ export const SectionReviewPanel: React.FC = () => {
               待招設組業務審查之預約申請單 ({pendingReservations.length})
             </h3>
             <span className="text-xs text-slate-500">
-              審查要點：核對30日前登記規範、借用天數上限3日、設備妥善率及有無衝堂
+              審查要點：核對1日前先行登記規範、借用天數上限3日、設備妥善率及有無衝堂
             </span>
           </div>
 

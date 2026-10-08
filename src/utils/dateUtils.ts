@@ -1,6 +1,6 @@
 /**
  * 學校設備借用規則日期處理工具
- * 規則1: 借用前須於借用日30日前先行登記 (Earliest startDate >= Today + 30 days)
+ * 規則1: 借用前須於借用日1日前先行登記 (Earliest startDate >= Today + 1 day)
  * 規則2: 借用後須於3日內歸還 (expectedReturnDate <= startDate + 3 days)
  * 規則3: 特殊原因延長借用需另案申請
  */
@@ -42,9 +42,9 @@ export function daysBetween(startDateStr: string, endDateStr: string): number {
   return Math.round(diffTime / (1000 * 60 * 60 * 24));
 }
 
-// 計算最早可預約借用日 (今日 + 30天)
+// 計算最早可預約借用日 (今日 + 1天，須於借用日前1天先行登記)
 export function getEarliestReservationDate(todayStr = getTodayString()): string {
-  return addDays(todayStr, 30);
+  return addDays(todayStr, 1);
 }
 
 // 計算最長標準歸還日 (起始日 + 3天)
@@ -52,12 +52,12 @@ export function getMaxStandardReturnDate(startDateStr: string): string {
   return addDays(startDateStr, 3);
 }
 
-// 檢查起始日是否符合「30日前登記」規定
+// 檢查起始日是否符合「1日前先行登記」規定
 export function isValidAdvanceBookingDate(startDateStr: string, todayStr = getTodayString()): { valid: boolean; minAllowedDate: string; diffDays: number } {
   const minAllowedDate = getEarliestReservationDate(todayStr);
   const diffDays = daysBetween(todayStr, startDateStr);
   return {
-    valid: diffDays >= 30,
+    valid: diffDays >= 1,
     minAllowedDate,
     diffDays
   };

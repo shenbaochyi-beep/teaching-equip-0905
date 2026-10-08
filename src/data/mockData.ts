@@ -138,7 +138,7 @@ export const INITIAL_USERS: UserProfile[] = [
   },
   {
     id: 'user-sa-cai',
-    username: 'slva331',
+    username: 'slvs331',
     name: '蔡足英 組長',
     role: 'faculty',
     title: '生輔組長',
@@ -217,7 +217,7 @@ export const INITIAL_USERS: UserProfile[] = [
   // 18. 總務處主任
   {
     id: 'user-ga-wang',
-    username: 'slva500',
+    username: 'slvs500',
     name: '王恩豪 主任',
     role: 'faculty',
     title: '總務主任',
@@ -230,7 +230,7 @@ export const INITIAL_USERS: UserProfile[] = [
   // 19-20. 輔導室主任與特教老師
   {
     id: 'user-guid-wei',
-    username: 'slva170',
+    username: 'slvs170',
     name: '魏頡 主任',
     role: 'faculty',
     title: '輔導室主任',
@@ -854,9 +854,9 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
     courseName: '校務發展諮詢',
     targetClass: '各處室同仁與諮詢委員',
     estimatedAttendees: 12,
-    startDate: addDays(today, 35),
+    startDate: addDays(today, 2),
     startTime: '08:30',
-    expectedReturnDate: addDays(today, 37),
+    expectedReturnDate: addDays(today, 4),
     expectedReturnTime: '12:00',
     status: 'pending_project_staff',
     submittedAt: `${today} 15:00`,
@@ -866,7 +866,7 @@ export const INITIAL_RESERVATIONS: Reservation[] = [
         step: 'submission',
         actorName: '鄭安順 秘書',
         actorRole: '申請人 (秘書)',
-        action: '送出合作學習教室借用登記單 (提前35天預約登記，提請第一層教務處計畫人員初審確認)',
+        action: '送出合作學習教室借用登記單 (提前登記，提請第一層教務處計畫人員初審確認)',
         timestamp: `${today} 15:00`,
         statusChange: '待第一層計畫人員初審確認'
       }
